@@ -26,3 +26,5 @@ export const Flex = forwardRef<FlexProps, "div">(
     />
   )
 );
+
+Flex.displayName = "Flex";

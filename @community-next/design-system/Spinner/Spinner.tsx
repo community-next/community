@@ -27,3 +27,5 @@ export const Spinner: React.FC<SpinnerProps> = ({ className, ...props }) => {
     </svg>
   );
 };
+
+Spinner.displayName = "Spinner";

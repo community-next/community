@@ -9,7 +9,7 @@ const colors = {
     100: "#F7F7F7",
     50: "#FFFFFF",
   },
-  "drak-gray": {
+  "dark-gray": {
     900: "#E8E8E8",
     600: "#BABABA",
     400: "#767676",

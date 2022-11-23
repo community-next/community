@@ -1,7 +1,7 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
 import { Flex } from "../Flex";
-describe("Stack", () => {
+describe("Flex", () => {
   test("can render a div with flex", () => {
     render(<Flex id="test1">Hello world</Flex>);
 

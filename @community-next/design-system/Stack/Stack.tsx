@@ -36,6 +36,8 @@ export const Stack = forwardRef<StackProps, "div">(
   )
 );
 
+Stack.displayName = "Stack";
+
 Stack.defaultProps = {
   space: 2,
   direction: "column",
@@ -45,8 +47,10 @@ export type HStackProps = Omit<StackProps, "direction">;
 export const HStack = forwardRef<HStackProps, "div">((props, ref) => (
   <Stack {...props} direction="row" ref={ref} />
 ));
+HStack.displayName = "HStack";
 
 export type VStackProps = Omit<StackProps, "direction">;
 export const VStack = forwardRef<VStackProps, "div">((props, ref) => (
   <Stack {...props} direction="column" ref={ref} />
 ));
+VStack.displayName = "VStack";
