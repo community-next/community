@@ -26,10 +26,17 @@ export const Button = forwardRef<ButtonProps, "button">(
         ref={ref}
         disabled={disabled}
         className={clsx(
-          "inline-flex items-center justify-center font-medium text-center cursor-pointer select-none transition-all duration-300 ease-in-out outline-0",
           {
+            "cursor-pointer select-none outline-0": true,
+            "font-medium text-center": true,
+            "inline-flex items-center justify-center": true,
+            "transition-all duration-300 ease-in-out": true,
             "bg-transparent border-transparent text-gray-600": !variant,
-            "bg-light-blue-600 border-light-blue-200 text-white hover:bg-light-blue-500 dark:bg-drak-blue-600 dark:border-drak-blue-200 dark:hover:bg-dark-blue-500":
+            " text-white": variant === "primary",
+            "border-light-blue-border dark:border-drak-blue-border":
+              variant === "primary",
+            "bg-light-blue-base dark:bg-dark-blue-base": variant === "primary",
+            "hover:bg-light-blue-hover dark:hover:bg-dark-blue-hover":
               variant === "primary",
             "rounded px-4 py-3 gap-2 text-xl": size === "lg",
             "rounded px-3 py-2 gap-2 text-base": size === "md",

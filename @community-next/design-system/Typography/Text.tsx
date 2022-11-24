@@ -19,10 +19,12 @@ export const Text = forwardRef<TextProps, "div">(function Text(
       ref={ref}
       className={clsx(
         {
-          "text-light-gray-900 dark:text-dark-gray-900": variant === "primary",
-          "text-light-gray-600 dark:text-dark-gray-600":
+          "text-light-gray-content1 dark:text-dark-gray-content1":
+            variant === "primary",
+          "text-light-gray-content2 dark:text-dark-gray-content2":
             variant === "secondary",
-          "text-light-gray-400 dark:text-dark-gray-400": variant === "tertiary",
+          "text-light-gray-content3 dark:text-dark-gray-content3":
+            variant === "tertiary",
           "text-ellipsis": numberOfLines,
           "line-clamp-1 whitespace-nowrap": numberOfLines === 1,
           "line-clamp-2": numberOfLines === 2,

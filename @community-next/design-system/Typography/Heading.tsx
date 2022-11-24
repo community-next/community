@@ -13,7 +13,7 @@ export const Heading = forwardRef<HeadingProps, "h2">(function Heading(
       as={as}
       ref={ref}
       className={clsx(
-        "font-medium text-light-gray-900 dark:text-dark-gray-900",
+        "font-medium text-light-gray-content1 dark:text-dark-gray-content1",
         {
           "text-5xl leading-tight": as === "h1",
           "text-4xl leading-[1.333]": as === "h2",
