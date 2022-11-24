@@ -1,7 +1,7 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
 import { Center } from "../Center";
-describe("Stack", () => {
+describe("Center", () => {
   test("can render a div with Center", () => {
     render(<Center id="test1">Hello world</Center>);
 

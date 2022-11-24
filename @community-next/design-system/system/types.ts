@@ -41,8 +41,57 @@ type ComponentWithAs<Component extends AsElement, Props extends object = {}> = {
   id?: string;
 };
 
+type BorderColor =
+  | true
+  | "gray"
+  | "blue"
+  | "green"
+  | "orange"
+  | "red"
+  | "yellow";
+
+type BackgroundColor =
+  | true
+  | "gray"
+  | "gray-secondary"
+  | "blue"
+  | "green"
+  | "orange"
+  | "red"
+  | "yellow";
+
+type TextColor =
+  | "content1"
+  | "content2"
+  | "content3"
+  | "blue"
+  | "green"
+  | "orange"
+  | "red"
+  | "yellow";
+
+type Rounded = true | "none" | "sm" | "base" | "md" | "lg" | "full";
+type Border = true | "none" | "2";
+
+export interface BaseProps {
+  borderColor?: BorderColor;
+  borderTopColor?: BorderColor;
+  borderRightColor?: BorderColor;
+  borderBottomColor?: BorderColor;
+  borderLeftColor?: BorderColor;
+  backgroundColor?: BackgroundColor;
+  color?: TextColor;
+  hoverColor?: TextColor;
+  rounded?: Rounded;
+  border?: Border;
+  borderTop?: Border;
+  borderRight?: Border;
+  borderBottom?: Border;
+  borderLeft?: Border;
+}
+
 export interface AsComponent<T extends AsElement, P = {}>
-  extends ComponentWithAs<T, {} & P> {}
+  extends ComponentWithAs<T, BaseProps & Omit<P, "color">> {}
 
 export type DOMElements = keyof JSX.IntrinsicElements;
 
@@ -50,6 +99,10 @@ export type HTMLAsComponents = {
   [Tag in DOMElements]: AsComponent<Tag, {}>;
 };
 
-export type HTMLAsProps<T extends AsElement> = Omit<PropsOf<T>, "ref"> & {
-  as?: AsElement;
-};
+export type HTMLAsProps<T extends AsElement> = Omit<
+  PropsOf<T>,
+  "ref" | "color"
+> &
+  BaseProps & {
+    as?: AsElement;
+  };
