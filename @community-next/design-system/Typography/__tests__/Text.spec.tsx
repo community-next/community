@@ -1,9 +1,11 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
-import { Text, TextSize } from "../Text";
+import { Text } from "../Text";
+import { TextSize } from "../../system";
+
 describe("Text", () => {
   test.each(["xs", "sm", "lg", "xl"])("can set size with %s", (sizeProp) => {
-    const props = { size: sizeProp } as { size: TextSize };
+    const props = { textSize: sizeProp } as { textSize: TextSize };
     render(
       <Text id="test1" {...props}>
         Hello world

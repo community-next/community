@@ -41,7 +41,7 @@ type ComponentWithAs<Component extends AsElement, Props extends object = {}> = {
   id?: string;
 };
 
-type BorderColor =
+export type BorderColor =
   | true
   | "gray"
   | "blue"
@@ -50,7 +50,7 @@ type BorderColor =
   | "red"
   | "yellow";
 
-type BackgroundColor =
+export type BackgroundColor =
   | true
   | "gray"
   | "gray-secondary"
@@ -60,7 +60,7 @@ type BackgroundColor =
   | "red"
   | "yellow";
 
-type TextColor =
+export type TextColor =
   | "content1"
   | "content2"
   | "content3"
@@ -70,15 +70,13 @@ type TextColor =
   | "red"
   | "yellow";
 
-type Rounded = true | "none" | "sm" | "base" | "md" | "lg" | "full";
-type Border = true | "none" | "2";
+export type Rounded = true | "none" | "sm" | "base" | "md" | "lg" | "full";
+export type Border = true | "none" | "2";
+export type FontWeight = "normal" | "medium" | "semibold" | "bold";
+export type TextSize = "xs" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "4xl";
 
 export interface BaseProps {
   borderColor?: BorderColor;
-  borderTopColor?: BorderColor;
-  borderRightColor?: BorderColor;
-  borderBottomColor?: BorderColor;
-  borderLeftColor?: BorderColor;
   backgroundColor?: BackgroundColor;
   color?: TextColor;
   hoverColor?: TextColor;
@@ -88,6 +86,8 @@ export interface BaseProps {
   borderRight?: Border;
   borderBottom?: Border;
   borderLeft?: Border;
+  fontWeight?: FontWeight;
+  textSize?: TextSize;
 }
 
 export interface AsComponent<T extends AsElement, P = {}>

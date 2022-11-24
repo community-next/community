@@ -30,6 +30,8 @@ export function createAsComponent<T extends AsElement, P = HTMLAsProps<T>>(
       color,
       rounded,
       hoverColor,
+      fontWeight,
+      textSize,
       ...props
     },
     ref
@@ -128,6 +130,19 @@ export function createAsComponent<T extends AsElement, P = HTMLAsProps<T>>(
             "border-l": borderLeft === true,
             "border-l-0": borderLeft === "none",
             "border-l-2": borderLeft === "2",
+
+            "font-normal": fontWeight === "normal",
+            "font-medium": fontWeight === "medium",
+            "font-semibold": fontWeight === "semibold",
+            "font-bold": fontWeight === "bold",
+
+            "text-xs": textSize === "xs",
+            "text-sm": textSize === "sm",
+            "text-lg": textSize === "lg",
+            "text-xl": textSize === "xl",
+            "text-2xl": textSize === "2xl",
+            "text-3xl": textSize === "3xl",
+            "text-4xl": textSize === "4xl",
           },
           className
         )}
