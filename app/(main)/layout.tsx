@@ -11,7 +11,7 @@ export default function MainLayout({
   return (
     <Container>
       <div className="grid grid-cols-[290px_1fr] h-screen">
-        <Box borderRight borderRightColor>
+        <Box borderRight borderColor>
           <HStack as="header" space={4} className="p-6">
             <Center border borderColor rounded className="w-14 h-14"></Center>
           </HStack>

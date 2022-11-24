@@ -55,66 +55,6 @@ export function createAsComponent<T extends AsElement, P = HTMLAsProps<T>>(
             "border-light-yellow-border dark:border-dark-yellow-border":
               borderColor === "yellow",
 
-            "border-t-light-gray-border dark:border-t-dark-gray-border": [
-              true,
-              "gray",
-            ].includes(borderTopColor),
-            "border-t-light-blue-border dark:border-t-dark-blue-border":
-              borderTopColor === "blue",
-            "border-t-light-green-border dark:border-t-dark-green-border":
-              borderTopColor === "green",
-            "border-t-light-orange-border dark:border-t-dark-orange-border":
-              borderTopColor === "orange",
-            "border-t-light-red-border dark:border-t-dark-red-border":
-              borderTopColor === "red",
-            "border-t-light-yellow-border dark:border-t-dark-yellow-border":
-              borderTopColor === "yellow",
-
-            "border-r-light-gray-border dark:border-r-dark-gray-border": [
-              true,
-              "gray",
-            ].includes(borderRightColor),
-            "border-r-light-blue-border dark:border-r-dark-blue-border":
-              borderRightColor === "blue",
-            "border-r-light-green-border dark:border-r-dark-green-border":
-              borderRightColor === "green",
-            "border-r-light-orange-border dark:border-r-dark-orange-border":
-              borderRightColor === "orange",
-            "border-r-light-red-border dark:border-r-dark-red-border":
-              borderRightColor === "red",
-            "border-r-light-yellow-border dark:border-r-dark-yellow-border":
-              borderRightColor === "yellow",
-
-            "border-b-light-gray-border dark:border-b-dark-gray-border": [
-              true,
-              "gray",
-            ].includes(borderBottomColor),
-            "border-b-light-blue-border dark:border-b-dark-blue-border":
-              borderBottomColor === "blue",
-            "border-b-light-green-border dark:border-b-dark-green-border":
-              borderBottomColor === "green",
-            "border-b-light-orange-border dark:border-b-dark-orange-border":
-              borderBottomColor === "orange",
-            "border-b-light-red-border dark:border-b-dark-red-border":
-              borderBottomColor === "red",
-            "border-b-light-yellow-border dark:border-b-dark-yellow-border":
-              borderBottomColor === "yellow",
-
-            "border-l-light-gray-border dark:border-l-dark-gray-border": [
-              true,
-              "gray",
-            ].includes(borderLeftColor),
-            "border-l-light-blue-border dark:border-l-dark-blue-border":
-              borderLeftColor === "blue",
-            "border-l-light-green-border dark:border-l-dark-green-border":
-              borderLeftColor === "green",
-            "border-l-light-orange-border dark:border-l-dark-orange-border":
-              borderLeftColor === "orange",
-            "border-l-light-red-border dark:border-l-dark-red-border":
-              borderLeftColor === "red",
-            "border-l-light-yellow-border dark:border-l-dark-yellow-border":
-              borderLeftColor === "yellow",
-
             "bg-light-gray-background-primary dark:bg-dark-gray-background-primary":
               [true, "gray"].includes(backgroundColor),
             "bg-light-gray-background-secondary dark:bg-dark-gray-background-secondary":
