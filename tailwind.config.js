@@ -1,3 +1,5 @@
+const defaultTheme = require('tailwindcss/defaultTheme')
+
 const { colors } = require("./@community-next/design-system/theme/colors")
 
 /** @type {import('tailwindcss').Config} */
@@ -10,7 +12,11 @@ module.exports = {
   ],
   theme: {
     colors,
-    extend: {},
+    extend: {
+      fontFamily: {
+        'sans': ['Inter', ...defaultTheme.fontFamily.sans],
+      },
+    },
   },
   plugins: [require('@tailwindcss/line-clamp')],
 }

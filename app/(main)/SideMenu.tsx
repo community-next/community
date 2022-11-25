@@ -22,7 +22,7 @@ const SideMenuLink: React.FC<{ link: MenuLink }> = ({ link }) => (
     href={link.url}
     space={4}
     backgroundColor={link.active ? "blue" : undefined}
-    color={link.active ? "blue" : "content2"}
+    color={link.active ? "blue" : "content3"}
     rounded
     className={clsx("p-3 items-center leading-tight", {
       "hover:bg-light-gray-background-secondary dark:hover:bg-light-gray-background-secondary":
