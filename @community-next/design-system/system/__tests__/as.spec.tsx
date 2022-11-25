@@ -1,10 +1,11 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
 
-import { createAsComponent, As } from "../as";
+import { createStyledComponent } from "../styled-system";
+import { styled } from "../styled";
 
-describe("createAsComponent", () => {
-  const Div = createAsComponent("div");
+describe("createStyledComponent", () => {
+  const Div = createStyledComponent("div");
   test("can render a div", () => {
     const { container } = render(<Div id="test1">Hello world</Div>);
 
@@ -41,7 +42,9 @@ describe("createAsComponent", () => {
 
 describe("as", () => {
   test("can render a div", () => {
-    const { container } = render(<As.div id="test1">Hello world</As.div>);
+    const { container } = render(
+      <styled.div id="test1">Hello world</styled.div>
+    );
 
     const el = container.querySelector("#test1");
     expect(el).toContainHTML("Hello world");
@@ -50,9 +53,9 @@ describe("as", () => {
 
   test("can render a link by as", () => {
     const { container } = render(
-      <As.div id="test1" as="a" href="/hello">
+      <styled.div id="test1" as="a" href="/hello">
         Hello world
-      </As.div>
+      </styled.div>
     );
 
     const el = container.querySelector("#test1");

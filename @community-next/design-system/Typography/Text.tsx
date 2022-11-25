@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import React from "react";
-import { As, HTMLAsProps, forwardRef } from "../system";
-export interface TextProps extends HTMLAsProps<"div"> {
+import { styled, HTMLStyledProps, forwardRef } from "../system";
+export interface TextProps extends HTMLStyledProps<"div"> {
   variant?: "primary" | "secondary" | "tertiary";
   numberOfLines?: 1 | 2 | 3 | 4 | 5;
 }
@@ -11,7 +11,7 @@ export const Text = forwardRef<TextProps, "div">(function Text(
   ref
 ) {
   return (
-    <As.div
+    <styled.div
       ref={ref}
       className={clsx(
         {

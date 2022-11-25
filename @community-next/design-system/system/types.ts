@@ -14,10 +14,10 @@ export type MergeWithAs<
   ComponentProps extends object,
   AsProps extends object,
   AdditionalProps extends object = {},
-  AsComponent extends AsElement = AsElement
+  StyledComponent extends AsElement = AsElement
 > = RightJoinProps<ComponentProps, AdditionalProps> &
   RightJoinProps<AsProps, AdditionalProps> & {
-    as?: AsComponent;
+    as?: StyledComponent;
   };
 
 export type PropsOf<T extends AsElement> = React.ComponentPropsWithoutRef<T> & {
@@ -25,12 +25,12 @@ export type PropsOf<T extends AsElement> = React.ComponentPropsWithoutRef<T> & {
 };
 
 type ComponentWithAs<Component extends AsElement, Props extends object = {}> = {
-  <AsComponent extends AsElement = Component>(
+  <StyledComponent extends AsElement = Component>(
     props: MergeWithAs<
       React.ComponentProps<Component>,
-      React.ComponentProps<AsComponent>,
+      React.ComponentProps<StyledComponent>,
       Props,
-      AsComponent
+      StyledComponent
     >
   ): JSX.Element;
 
@@ -82,7 +82,7 @@ export type Leading =
   | "relaxed"
   | "loose";
 
-export interface BaseProps {
+export interface StyledProps {
   borderColor?: BorderColor;
   backgroundColor?: BackgroundColor;
   color?: TextColor;
@@ -98,19 +98,19 @@ export interface BaseProps {
   leading?: Leading;
 }
 
-export interface AsComponent<T extends AsElement, P = {}>
-  extends ComponentWithAs<T, BaseProps & Omit<P, "color">> {}
+export interface StyledComponent<T extends AsElement, P = {}>
+  extends ComponentWithAs<T, StyledProps & Omit<P, "color">> {}
 
 export type DOMElements = keyof JSX.IntrinsicElements;
 
-export type HTMLAsComponents = {
-  [Tag in DOMElements]: AsComponent<Tag, {}>;
+export type HTMLStyledComponents = {
+  [Tag in DOMElements]: StyledComponent<Tag, {}>;
 };
 
-export type HTMLAsProps<T extends AsElement> = Omit<
+export type HTMLStyledProps<T extends AsElement> = Omit<
   PropsOf<T>,
   "ref" | "color"
 > &
-  BaseProps & {
+  StyledProps & {
     as?: AsElement;
   };

@@ -1,15 +1,15 @@
 import clsx from "clsx";
 import React from "react";
-import { As, HTMLAsProps, forwardRef } from "../system";
+import { styled, HTMLStyledProps, forwardRef } from "../system";
 
-export interface HeadingProps extends HTMLAsProps<"h2"> {}
+export interface HeadingProps extends HTMLStyledProps<"h2"> {}
 
 export const Heading = forwardRef<HeadingProps, "h2">(function Heading(
   { className, as, ...rest },
   ref
 ) {
   return (
-    <As.h2
+    <styled.h2
       as={as}
       ref={ref}
       className={clsx(

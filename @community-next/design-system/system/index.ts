@@ -1,3 +1,3 @@
-export * from "./as";
+export * from "./styled";
 export * from "./forwardRef";
 export * from "./types";

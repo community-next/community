@@ -1,18 +1,19 @@
 import clsx from "clsx";
 import React from "react";
 import {
-  AsElement,
-  AsComponent,
+  StyledComponent,
   DOMElements,
-  HTMLAsProps,
-  BaseProps,
+  AsElement,
+  HTMLStyledProps,
 } from "./types";
 
+// support basic styled props
 // support `as` prop for a component
-export function createAsComponent<T extends AsElement, P = HTMLAsProps<T>>(
-  component: T
-) {
-  return React.forwardRef(function AsComponent(
+export function createStyledComponent<
+  T extends AsElement,
+  P = HTMLStyledProps<T>
+>(component: T) {
+  return React.forwardRef(function StyledComponent(
     {
       as,
       className,
@@ -157,16 +158,5 @@ export function createAsComponent<T extends AsElement, P = HTMLAsProps<T>>(
         {...props}
       />
     );
-  }) as AsComponent<T, P>;
+  }) as StyledComponent<T, P>;
 }
-
-export const As = new Proxy(
-  {},
-  {
-    get(_, element: DOMElements) {
-      return createAsComponent(element);
-    },
-  }
-) as {
-  [Tag in DOMElements]: AsComponent<Tag, HTMLAsProps<Tag>>;
-};

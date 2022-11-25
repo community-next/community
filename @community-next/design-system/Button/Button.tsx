@@ -1,8 +1,8 @@
 import clsx from "clsx";
 import React from "react";
-import { As, forwardRef, HTMLAsProps } from "../system";
+import { styled, forwardRef, HTMLStyledProps } from "../system";
 
-export type ButtonProps = HTMLAsProps<"button"> & {
+export type ButtonProps = HTMLStyledProps<"button"> & {
   variant?: "primary";
   size?: "lg" | "md" | "sm";
 };
@@ -21,7 +21,7 @@ export const Button = forwardRef<ButtonProps, "button">(
     ref
   ) => {
     return (
-      <As.button
+      <styled.button
         as={as}
         ref={ref}
         disabled={disabled}
@@ -48,7 +48,7 @@ export const Button = forwardRef<ButtonProps, "button">(
         {...props}
       >
         {children}
-      </As.button>
+      </styled.button>
     );
   }
 );

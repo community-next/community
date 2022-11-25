@@ -1,5 +1,5 @@
 import React from "react";
-import { AsElement, AsComponent, PropsOf, RightJoinProps } from "./types";
+import { AsElement, StyledComponent, PropsOf, RightJoinProps } from "./types";
 
 export function forwardRef<Props extends object, Component extends AsElement>(
   component: React.ForwardRefRenderFunction<
@@ -9,7 +9,7 @@ export function forwardRef<Props extends object, Component extends AsElement>(
     }
   >
 ) {
-  return React.forwardRef(component) as unknown as AsComponent<
+  return React.forwardRef(component) as unknown as StyledComponent<
     Component,
     Props
   >;
