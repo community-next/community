@@ -32,6 +32,7 @@ export function createAsComponent<T extends AsElement, P = HTMLAsProps<T>>(
       hoverColor,
       fontWeight,
       textSize,
+      leading,
       ...props
     },
     ref
@@ -143,6 +144,13 @@ export function createAsComponent<T extends AsElement, P = HTMLAsProps<T>>(
             "text-2xl": textSize === "2xl",
             "text-3xl": textSize === "3xl",
             "text-4xl": textSize === "4xl",
+
+            "leading-none": leading === "none",
+            "leading-tight": leading === "tight",
+            "leading-snug": leading === "snug",
+            "leading-normal": leading === "normal",
+            "leading-relaxed": leading === "relaxed",
+            "leading-loose": leading === "loose",
           },
           className
         )}
