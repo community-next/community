@@ -1,6 +1,6 @@
 const defaultTheme = require('tailwindcss/defaultTheme')
 
-const { colors } = require("./@community-next/design-system/theme/colors")
+const { colors, backgroundImage, boxShadow } = require("./@community-next/design-system/theme")
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
@@ -8,7 +8,7 @@ module.exports = {
   content: [
     './app/**/*.{js,ts,jsx,tsx}',
     './components/**/*.{js,ts,jsx,tsx}',
-    './@community-next/**/*.{js,ts,jsx,tsx}'
+    './@community-next/design-system/**/*.{js,ts,jsx,tsx}'
   ],
   theme: {
     colors,
@@ -16,6 +16,8 @@ module.exports = {
       fontFamily: {
         'sans': ['Inter', ...defaultTheme.fontFamily.sans],
       },
+      boxShadow,
+      backgroundImage,
     },
   },
   plugins: [require('@tailwindcss/line-clamp')],

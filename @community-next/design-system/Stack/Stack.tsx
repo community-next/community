@@ -13,7 +13,6 @@ export const Stack = forwardRef<StackProps, "div">(
   ({ className, space, ...rest }, ref) => (
     <Flex
       className={clsx(
-        "self-stretch",
         {
           "gap-0": space === 0,
           "gap-1": space === 1,
