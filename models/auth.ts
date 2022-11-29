@@ -1,6 +1,7 @@
 import { NextAuthOptions } from "next-auth";
+import getUnixTime from "date-fns/getUnixTime";
 import GitHubProvider from "next-auth/providers/github";
-import { getUserByEmail } from "./users";
+import { createUser, getUserByEmail, updateUser } from "./users";
 
 export const authOptions: NextAuthOptions = {
   session: {
@@ -8,6 +9,7 @@ export const authOptions: NextAuthOptions = {
   },
   pages: {
     signIn: "/login",
+    signOut: "/signout",
   },
   providers: [
     GitHubProvider({
@@ -28,16 +30,29 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
     async jwt({ token, user }) {
-      if (token.email) {
-        const dbUser = await getUserByEmail(token.email);
-        if (dbUser) {
-          return {
-            id: dbUser.id,
-            name: dbUser.displayName,
-            email: dbUser.email,
-            picture: dbUser.profileUrl,
-          };
+      const { email, name, picture } = token;
+      if (email) {
+        let dbUser = await getUserByEmail(email);
+        if (!dbUser) {
+          dbUser = await createUser(
+            email,
+            name ?? email.split("@")[0],
+            picture ?? undefined
+          );
+        } else {
+          const timestamp = getUnixTime(new Date());
+          dbUser.lastActivityAt = timestamp;
+
+          // no need to await the result
+          updateUser(dbUser);
         }
+
+        return {
+          id: dbUser.id,
+          name: dbUser.displayName,
+          email: dbUser.email,
+          picture: dbUser.avatarUrl,
+        };
       }
       token.id = user?.id;
       return token;

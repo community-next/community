@@ -123,6 +123,6 @@ export class CosmosDB {
 
     const database = this.client.database(this.database);
 
-    this.users = new Container(database, "users");
+    this.users = new Container(database, "community_users");
   }
 }

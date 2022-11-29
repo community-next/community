@@ -1,9 +1,9 @@
 export interface User {
   id: string;
   email: string;
-  username: string;
+  username?: string;
   displayName: string;
-  profileUrl: string;
+  avatarUrl?: string;
   createdAt: number;
   lastActivityAt: number;
 }
