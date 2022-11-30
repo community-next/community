@@ -1,16 +1,18 @@
 import { User, IUserService } from "@community-next/models";
+import { CosmosContainer } from "./CosmosContainer";
 import { CosmosDB } from "./CosmosDB";
+import { containers } from "./schema";
 
 export class UserService implements IUserService {
-  private db: CosmosDB;
+  private container: CosmosContainer;
 
   constructor(db: CosmosDB) {
-    this.db = db;
     this.getUsersByIds = this.getUsersByIds.bind(this);
+    this.container = db.getContainer(containers.users.containerId);
   }
 
   async getUsersByIds(ids: readonly string[]): Promise<User[]> {
-    return this.db.users.getItemsByIds<User>(ids);
+    return this.container.getItemsByIds<User>(ids);
   }
 
   async getUserIdByEmail(email: string): Promise<string | null> {
@@ -18,16 +20,16 @@ export class UserService implements IUserService {
       query: "select * from c where c.email=@email",
       parameters: [{ name: "@email", value: email }],
     };
-    const res = await this.db.users.getItem<User>(querySpec);
+    const res = await this.container.getItem<User>(querySpec);
     return res?.id ?? null;
   }
 
   async createUser(user: User): Promise<User> {
-    const res = await this.db.users.upsertItem(user);
+    const res = await this.container.insertItem(user);
     return user;
   }
 
   async updateUser(user: User): Promise<void> {
-    await this.db.users.upsertItem(user);
+    await this.container.upsertItem(user);
   }
 }
