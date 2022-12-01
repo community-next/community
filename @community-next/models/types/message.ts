@@ -2,7 +2,7 @@ import { ContentFormat } from "./content";
 
 export interface Message {
   id: string;
-  conversationId: string;
+  channelId: string;
   userId: string;
   format: ContentFormat;
   content: string;

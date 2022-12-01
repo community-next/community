@@ -1,8 +1,13 @@
-import { Channel, DirectMessage, UserConversation } from "../types";
+import { Room, DirectMessage, GroupMessage } from "../types";
 
 export interface IConversationService {
-  getChannels(conversationIds: string[]): Promise<Channel[]>;
-  createChannel(userId: string, channel: Channel): Promise<Channel>;
+  getRooms(ids: string[]): Promise<Room[]>;
+
+  createGroupMessage(
+    userId: string,
+    group: GroupMessage
+  ): Promise<GroupMessage>;
+
   startConversation(
     participant1: string,
     participant2: string

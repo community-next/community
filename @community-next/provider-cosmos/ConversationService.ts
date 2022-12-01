@@ -2,30 +2,33 @@ import { v4 as uuidv4 } from "uuid";
 import getUnixTime from "date-fns/getUnixTime";
 import {
   IConversationService,
-  Channel,
+  Room,
   DirectMessage,
+  GroupMessage,
+  ConversationType,
 } from "@community-next/models";
-import { CosmosContainer } from "./CosmosContainer";
-import { CosmosDB } from "./CosmosDB";
-import { containers } from "./schema";
+import { CosmosDB, containers, CosmosContainer } from "./db";
 
 export class ConversationService implements IConversationService {
-  private channels: CosmosContainer;
+  private rooms: CosmosContainer;
   private dm: CosmosContainer;
 
   constructor(db: CosmosDB) {
-    this.channels = db.getContainer(containers.channels.containerId);
+    this.rooms = db.getContainer(containers.rooms.containerId);
     this.dm = db.getContainer(containers.directMessages.containerId);
   }
 
-  async getChannels(ids: string[]): Promise<Channel[]> {
-    return this.channels.getItemsByIds<Channel>(ids);
+  async getRooms(ids: string[]): Promise<Room[]> {
+    return this.rooms.getItemsByIds<Room>(ids);
   }
 
-  async createChannel(userId: string, channel: Channel): Promise<Channel> {
-    channel.ownerId = userId;
-    const res = await this.channels.insertItem(channel);
-    return channel;
+  async createGroupMessage(
+    userId: string,
+    group: GroupMessage
+  ): Promise<GroupMessage> {
+    group.ownerId = userId;
+    const res = await this.rooms.insertItem(group);
+    return group;
   }
 
   async startConversation(
@@ -49,6 +52,7 @@ export class ConversationService implements IConversationService {
     const timestamp = getUnixTime(new Date());
     const dm: DirectMessage = {
       id: uuidv4(),
+      type: ConversationType.DIRECT,
       createdAt: timestamp,
       participant1,
       participant2,

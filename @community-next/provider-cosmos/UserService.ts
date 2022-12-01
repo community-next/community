@@ -1,7 +1,5 @@
 import { User, IUserService } from "@community-next/models";
-import { CosmosContainer } from "./CosmosContainer";
-import { CosmosDB } from "./CosmosDB";
-import { containers } from "./schema";
+import { CosmosDB, containers, CosmosContainer } from "./db";
 
 export class UserService implements IUserService {
   private container: CosmosContainer;

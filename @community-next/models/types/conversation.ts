@@ -3,16 +3,24 @@ export interface Conversation {
   createdAt: number;
   updatedAt?: number;
   lastMessageAt?: number;
+  type: ConversationType;
 }
 
 export interface Participant {
+  roomId: string;
   userId: string;
   joinedAt: number;
   lastActivityAt: number;
   lastMessageAt?: number;
 }
 
-export interface Channel extends Conversation {
+export enum ConversationType {
+  GROUP,
+  DIRECT,
+}
+
+export interface GroupMessage extends Conversation {
+  type: ConversationType.GROUP;
   slug?: string;
   ownerId: string;
   name: string;
@@ -24,12 +32,21 @@ export interface Channel extends Conversation {
 }
 
 export interface DirectMessage extends Conversation {
+  type: ConversationType.DIRECT;
   participant1: string;
   participant2: string;
 }
 
-export interface UserConversation {
-  userId: string;
-  channelIds: string[];
-  dmIds: string[];
+export type Room = GroupMessage | DirectMessage;
+
+export interface UserRoom {
+  id: string;
+  type: ConversationType;
+  name: string;
+  recipient?: string;
+}
+
+export interface UserRooms {
+  id: string; // userId
+  rooms: UserRoom[];
 }
