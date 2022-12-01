@@ -6,7 +6,7 @@ import {
   DirectMessage,
   GroupMessage,
   ConversationType,
-} from "@community-next/models";
+} from "@community-next/provider";
 import { CosmosDB, containers, CosmosContainer } from "./db";
 
 export class ConversationService implements IConversationService {

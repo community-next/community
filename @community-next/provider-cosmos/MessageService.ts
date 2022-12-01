@@ -3,7 +3,7 @@ import {
   IMessageService,
   PageSet,
   Pagination,
-} from "@community-next/models";
+} from "@community-next/provider";
 import { CosmosDB, containers, CosmosContainer } from "./db";
 
 export class MessageService implements IMessageService {

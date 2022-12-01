@@ -1,4 +1,4 @@
-import { User, IUserService } from "@community-next/models";
+import { User, IUserService } from "@community-next/provider";
 import { CosmosDB, containers, CosmosContainer } from "./db";
 
 export class UserService implements IUserService {

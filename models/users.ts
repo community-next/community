@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 import getUnixTime from "date-fns/getUnixTime";
-import { User } from "@community-next/models";
+import { User } from "@community-next/provider";
 import { createLoader } from "./dataloader";
 import { createProvider } from "./provider";
 

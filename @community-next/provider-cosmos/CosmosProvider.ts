@@ -1,4 +1,4 @@
-import { IProvider, IUserService } from "@community-next/models";
+import { IProvider, IUserService } from "@community-next/provider";
 import { CosmosDB } from "./db";
 import { UserService } from "./UserService";
 

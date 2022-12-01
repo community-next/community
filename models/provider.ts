@@ -1,4 +1,4 @@
-import { IProvider } from "@community-next/models";
+import { IProvider } from "@community-next/provider";
 
 import CosmosProvider from "@community-next/provider-cosmos";
 
