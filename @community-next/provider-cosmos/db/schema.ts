@@ -7,7 +7,7 @@ interface Container {
   uniqueKeys?: UniqueKey[];
 }
 
-export const containers: { [name: string]: Container } = {
+export const containers = {
   users: {
     containerId: "community_users",
     uniqueKeys: [{ paths: ["/email"] }, { paths: ["/username"] }],

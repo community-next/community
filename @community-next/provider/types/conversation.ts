@@ -3,7 +3,7 @@ export interface Conversation {
   createdAt: number;
   updatedAt?: number;
   lastMessageAt?: number;
-  type: ConversationType;
+  type: RoomType;
 }
 
 export interface Participant {
@@ -14,25 +14,23 @@ export interface Participant {
   lastMessageAt?: number;
 }
 
-export enum ConversationType {
+export enum RoomType {
   GROUP,
   DIRECT,
 }
 
 export interface GroupMessage extends Conversation {
-  type: ConversationType.GROUP;
+  type: RoomType.GROUP;
   slug?: string;
-  ownerId: string;
+  ownerId?: string;
   name: string;
   description: string;
   isPublic: boolean;
   isDisabled: boolean;
-  createdAt: number;
-  updatedAt?: number;
 }
 
 export interface DirectMessage extends Conversation {
-  type: ConversationType.DIRECT;
+  type: RoomType.DIRECT;
   participant1: string;
   participant2: string;
 }
@@ -41,7 +39,7 @@ export type Room = GroupMessage | DirectMessage;
 
 export interface UserRoom {
   id: string;
-  type: ConversationType;
+  type: RoomType;
   name: string;
   recipient?: string;
 }
