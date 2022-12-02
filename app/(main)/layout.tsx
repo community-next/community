@@ -3,11 +3,13 @@ import {
   BsFillChatSquareTextFill,
   BsFillEmojiSmileFill,
 } from "react-icons/bs";
-import { Box } from "@community-next/design-system/Box";
-import { Container } from "@community-next/design-system/Container";
-import { Center } from "@community-next/design-system/Flex";
-import { HStack, Stack } from "@community-next/design-system/Stack";
-import { Text } from "@community-next/design-system/Typography";
+import {
+  Box,
+  HStack,
+  Stack,
+  Text,
+  Center,
+} from "@community-next/design-system";
 
 import { BsHouseFill } from "react-icons/bs";
 import { SideMenu } from "./SideMenu";

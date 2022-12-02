@@ -2,8 +2,9 @@ import { ContentFormat } from "./content";
 
 export interface Message {
   id: string;
-  channelId: string;
+  roomId: string;
   userId: string;
+  displayName: string;
   format: ContentFormat;
   content: string;
   ipAddress: string;

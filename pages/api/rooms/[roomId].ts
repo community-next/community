@@ -1,8 +1,7 @@
 import { Room } from "@community-next/provider";
 import { getCurrentUser } from "lib/session";
-import { createGroupMessage, getRoom, getRoomBySlug } from "models/rooms";
+import { createGroupMessage, getRoom } from "models/rooms";
 import { NextApiRequest, NextApiResponse } from "next";
-import { validate as uuidValidate } from "uuid";
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const roomId = req.query.roomId as string;
@@ -11,10 +10,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
   const currentUser = (await getCurrentUser(req, res)) ?? undefined;
 
-  const isUUID = uuidValidate(roomId);
-  let room: Room | null = isUUID
-    ? await getRoom(roomId, currentUser)
-    : await getRoomBySlug(roomId, currentUser);
+  let room = await getRoom(roomId, currentUser);
 
   // create a default public room
   if (roomId === "public" && !room) {

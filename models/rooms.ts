@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from "uuid";
+import { v4 as uuidv4, validate as uuidValidate } from "uuid";
 import getUnixTime from "date-fns/getUnixTime";
 import {
   User,
@@ -14,49 +14,40 @@ const provider = createProvider();
 
 const loader = createLoader(provider.roomService.getRooms);
 
-export async function getRoom(id: string, user?: User): Promise<Room | null> {
+async function getRoomById(id: string, user?: User): Promise<Room | null> {
   const room = await loader.findOneById(id);
   if (!room) {
     return null;
   }
 
-  if (room.type === RoomType.DIRECT) {
-    // make sure the user is one of the participants of the direct message
-    if (
-      user &&
-      (room.participant1 === user.id || room.participant2 === user.id)
-    ) {
-      return room;
-    }
-  } else if (room.type === RoomType.GROUP) {
-    // veryone can access this room if it's public
-    if (room.isPublic) {
-      return room;
-    }
+  const hasViewPermission = await checkViewRoomPermission(room, user);
 
-    if (user) {
-      // make sure the user is a participant in this room
-      const isParticipant = await provider.roomService.isRoomParticipant(
-        room.id,
-        user.id
-      );
-
-      if (isParticipant) {
-        return room;
-      }
-    }
+  if (hasViewPermission) {
+    return room;
   }
 
   return null;
 }
 
-export async function getRoomBySlug(slug: string, user?: User) {
+async function getRoomBySlug(slug: string, user?: User) {
   const roomId = await provider.roomService.getRoomIdBySlug(slug);
   if (!roomId) {
     return null;
   }
 
-  return getRoom(roomId, user);
+  return getRoomById(roomId, user);
+}
+
+export async function getRoom(
+  idOrSlug: string,
+  user?: User
+): Promise<Room | null> {
+  const isUUID = uuidValidate(idOrSlug);
+  if (isUUID) {
+    return getRoomById(idOrSlug, user);
+  }
+
+  return getRoomBySlug(idOrSlug, user);
 }
 
 export async function createGroupMessage(
@@ -115,4 +106,40 @@ export async function startConversation(
   };
   await provider.roomService.createDirectMessage(dm);
   return dm;
+}
+
+export async function checkViewRoomPermission(
+  room: Room,
+  user?: User
+): Promise<boolean> {
+  if (room.type === RoomType.DIRECT) {
+    // make sure the user is one of the participants of the direct message
+    if (
+      user &&
+      (room.participant1 === user.id || room.participant2 === user.id)
+    ) {
+      return true;
+    }
+  }
+
+  if (room.type === RoomType.GROUP) {
+    // veryone can access this room if it's public
+    if (room.isPublic) {
+      return true;
+    }
+
+    if (user) {
+      // make sure the user is a participant in this room
+      const isParticipant = await provider.roomService.isRoomParticipant(
+        room.id,
+        user.id
+      );
+
+      if (isParticipant) {
+        return true;
+      }
+    }
+  }
+
+  return false;
 }

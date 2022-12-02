@@ -7,7 +7,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   const clientId = currentUser?.id ?? "community-next-guest";
 
   const apiKey = process.env.ABLY_API_KEY as string;
-  const client = new Ably.Realtime(apiKey);
+
+  const client = new Ably.Rest(apiKey);
   const tokenRequestData = await client.auth.createTokenRequest({
     clientId,
   });

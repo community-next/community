@@ -1,7 +1,6 @@
-import { Box } from "@community-next/design-system/Box";
-import { HStack, Stack } from "@community-next/design-system/Stack";
-import { Text } from "@community-next/design-system/Typography";
 import clsx from "clsx";
+import { Box, Text, HStack, Stack } from "@community-next/design-system";
+
 import { IconType } from "react-icons/lib";
 
 export interface MenuLink {
