@@ -4,7 +4,7 @@ import requestIp from "request-ip";
 
 import { ContentFormat, Room } from "@community-next/provider";
 import { withMethods } from "lib/middlewares/with-methods";
-import { getCurrentUser } from "lib/session";
+import { getCurrentSessionUser } from "lib/session";
 import { getRoom } from "models/rooms";
 import { newMessage } from "models/messages";
 
@@ -23,7 +23,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(400).end();
   }
 
-  const currentUser = await getCurrentUser(req, res);
+  const currentUser = await getCurrentSessionUser(req, res);
   if (!currentUser) {
     // sign in first
     return res.status(404).end();

@@ -12,6 +12,7 @@
   "dependencies": {
     "@ably-labs/react-hooks": "^2.0.11",
     "@azure/cosmos": "^3.17.2",
+    "@reduxjs/toolkit": "^1.9.1",
     "ably": "^1.2.33",
     "autoprefixer": "^10.4.13",
     "clsx": "^1.2.1",
@@ -25,6 +26,7 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-icons": "^4.6.0",
+    "react-redux": "^8.0.5",
     "request-ip": "^3.3.0",
     "tailwindcss": "^3.2.4",
     "typescript": "4.9.3",

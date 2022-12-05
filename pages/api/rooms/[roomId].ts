@@ -1,5 +1,5 @@
 import { Room } from "@community-next/provider";
-import { getCurrentUser } from "lib/session";
+import { getCurrentSessionUser } from "lib/session";
 import { createGroupMessage, getRoom } from "models/rooms";
 import { NextApiRequest, NextApiResponse } from "next";
 
@@ -8,7 +8,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (!roomId) {
     return res.status(404).end();
   }
-  const currentUser = (await getCurrentUser(req, res)) ?? undefined;
+  const currentUser = (await getCurrentSessionUser(req, res)) ?? undefined;
 
   let room = await getRoom(roomId, currentUser);
 

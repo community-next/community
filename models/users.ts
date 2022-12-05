@@ -1,8 +1,8 @@
 import { v4 as uuidv4 } from "uuid";
-import getUnixTime from "date-fns/getUnixTime";
 import { User } from "@community-next/provider";
 import { createLoader } from "./dataloader";
 import { createProvider } from "./provider";
+import { getTimestampInSeconds } from "@community-next/utils";
 
 const provider = createProvider();
 
@@ -25,7 +25,7 @@ export async function createUser(
   displayName: string,
   avatarUrl?: string
 ) {
-  const timestamp = getUnixTime(new Date());
+  const timestamp = getTimestampInSeconds();
   const user = {
     id: uuidv4(),
     email,

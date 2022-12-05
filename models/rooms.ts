@@ -1,5 +1,4 @@
 import { v4 as uuidv4, validate as uuidValidate } from "uuid";
-import getUnixTime from "date-fns/getUnixTime";
 import {
   User,
   Room,
@@ -9,6 +8,7 @@ import {
 } from "@community-next/provider";
 import { createLoader } from "./dataloader";
 import { createProvider } from "./provider";
+import { getTimestampInSeconds } from "@community-next/utils";
 
 const provider = createProvider();
 
@@ -57,7 +57,7 @@ export async function createGroupMessage(
   slug?: string,
   owner?: User
 ) {
-  const timestamp = getUnixTime(new Date());
+  const timestamp = getTimestampInSeconds();
   const group: GroupMessage = {
     id: uuidv4(),
     name,
@@ -95,7 +95,7 @@ export async function startConversation(
     }
   }
 
-  const timestamp = getUnixTime(new Date());
+  const timestamp = getTimestampInSeconds();
   dm = {
     id: uuidv4(),
     type: RoomType.DIRECT,

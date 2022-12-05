@@ -12,3 +12,7 @@ export interface Message {
   updatedAt?: number;
   deletedAt?: number;
 }
+
+export interface MessageDraft extends Message {
+  status: "sending" | "failed" | "sent";
+}

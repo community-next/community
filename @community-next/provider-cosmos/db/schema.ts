@@ -1,13 +1,13 @@
 import { UniqueKey } from "@azure/cosmos";
 
-interface Container {
+interface ContainerConfig {
   containerId: string;
   id?: string;
   partitionKey?: string;
   uniqueKeys?: UniqueKey[];
 }
 
-export const containers = {
+export const containers: Record<string, ContainerConfig> = {
   users: {
     containerId: "community_users",
     uniqueKeys: [{ paths: ["/email"] }, { paths: ["/username"] }],

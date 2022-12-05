@@ -1,7 +1,7 @@
 import { NextAuthOptions } from "next-auth";
-import getUnixTime from "date-fns/getUnixTime";
 import GitHubProvider from "next-auth/providers/github";
 import { createUser, getUserByEmail, updateUser } from "./users";
+import { getTimestampInSeconds } from "@community-next/utils";
 
 export const authOptions: NextAuthOptions = {
   session: {
@@ -40,7 +40,7 @@ export const authOptions: NextAuthOptions = {
             picture ?? undefined
           );
         } else {
-          const timestamp = getUnixTime(new Date());
+          const timestamp = getTimestampInSeconds();
           dbUser.lastActivityAt = timestamp;
 
           // no need to await the result
@@ -48,6 +48,7 @@ export const authOptions: NextAuthOptions = {
         }
 
         return {
+          ...dbUser,
           id: dbUser.id,
           name: dbUser.displayName,
           email: dbUser.email,

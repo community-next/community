@@ -1,9 +1,9 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import Ably from "ably/promises";
-import { getCurrentUser } from "lib/session";
+import { getCurrentSessionUser } from "lib/session";
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const currentUser = await getCurrentUser(req, res);
+  const currentUser = await getCurrentSessionUser(req, res);
   const clientId = currentUser?.id ?? "community-next-guest";
 
   const apiKey = process.env.ABLY_API_KEY as string;

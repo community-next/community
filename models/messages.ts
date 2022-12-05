@@ -1,8 +1,8 @@
-import { v4 as uuidv4 } from "uuid";
-import getUnixTime from "date-fns/getUnixTime";
+import { v4 as uuidv4, validate as uuidValidate } from "uuid";
 import { User, Room, Message, RoomType } from "@community-next/provider";
 import { createProvider } from "./provider";
 import { ContentFormat } from "@community-next/provider";
+import { getTimestampInSeconds } from "@community-next/utils";
 
 const provider = createProvider();
 
@@ -45,14 +45,14 @@ export async function newMessage(
   format: ContentFormat,
   ipAddress: string
 ): Promise<Message | null> {
-  const timestamp = getUnixTime(new Date());
+  const timestamp = getTimestampInSeconds();
   const hasNewMessagePermission = checkNewMessagePermission(room, user);
   if (!hasNewMessagePermission) {
     return null;
   }
 
   const message: Message = {
-    id: id ?? uuidv4(),
+    id: id && uuidValidate(id) ? id : uuidv4(),
     roomId: room.id,
     userId: user.id,
     displayName: user.displayName,
