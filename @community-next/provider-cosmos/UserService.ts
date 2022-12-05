@@ -1,6 +1,5 @@
 import { User, IUserService } from "@community-next/provider";
 import { CosmosDB, containers, CosmosContainer } from "./db";
-import { cleanCosmosPropsForItems } from "./lib/clean";
 
 export class UserService implements IUserService {
   private container: CosmosContainer;
@@ -12,7 +11,7 @@ export class UserService implements IUserService {
 
   async getUsersByIds(ids: readonly string[]): Promise<User[]> {
     const users = await this.container.getItemsByIds<User>(ids);
-    return cleanCosmosPropsForItems(users);
+    return users;
   }
 
   async getUserIdByEmail(email: string): Promise<string | null> {

@@ -1,6 +1,6 @@
 export interface Pagination {
   pageSize: number;
-  continuationToken: string;
+  continuationToken?: string;
 }
 
 export interface PageSet<T> {

@@ -19,12 +19,13 @@ export class MessageService implements IMessageService {
   }
 
   async getMessages(
-    conversationId: string,
+    roomId: string,
     page: Pagination
   ): Promise<PageSet<Message>> {
     const querySpec = {
-      query: "SELECT * from c where c.conversationId = @conversationId",
-      parameters: [{ name: "@conversationId", value: conversationId }],
+      query:
+        "SELECT * from c where c.roomId = @roomId order by c.createdAt DESC",
+      parameters: [{ name: "@roomId", value: roomId }],
     };
     const { items, hasMoreResults, continuationToken } =
       await this.container.getItemsWithContinuationToken<Message>(querySpec, {
@@ -35,7 +36,7 @@ export class MessageService implements IMessageService {
     return {
       items,
       pageSize: page.pageSize,
-      continuationToken: page.continuationToken,
+      continuationToken,
       hasMoreResults,
     };
   }

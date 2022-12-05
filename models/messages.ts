@@ -1,8 +1,16 @@
 import { v4 as uuidv4, validate as uuidValidate } from "uuid";
-import { User, Room, Message, RoomType } from "@community-next/provider";
+import {
+  User,
+  Room,
+  Message,
+  RoomType,
+  PageSet,
+  Pagination,
+} from "@community-next/provider";
 import { createProvider } from "./provider";
 import { ContentFormat } from "@community-next/provider";
 import { getTimestampInSeconds } from "@community-next/utils";
+import { getUsers } from "./users";
 
 const provider = createProvider();
 
@@ -66,4 +74,35 @@ export async function newMessage(
   await provider.messageService.newMessage(message);
 
   return message;
+}
+
+export async function getMessages(
+  conversationId: string,
+  pageSize = 50,
+  continuationToken?: string
+) {
+  const {
+    items,
+    continuationToken: newContinuationToken,
+    hasMoreResults,
+  } = await provider.messageService.getMessages(conversationId, {
+    pageSize,
+    continuationToken,
+  });
+
+  const messages = items.sort(
+    (item1, item2) => item1.createdAt - item2.createdAt
+  );
+  const userIds = new Set<string>();
+  messages.forEach((message) => {
+    userIds.add(message.userId);
+  });
+  const users = await getUsers(Array.from(userIds));
+
+  return {
+    messages,
+    users,
+    continuationToken: newContinuationToken,
+    hasMoreResults,
+  };
 }

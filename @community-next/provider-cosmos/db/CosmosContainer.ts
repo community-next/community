@@ -6,6 +6,7 @@ import {
   Container,
   ItemDefinition,
 } from "@azure/cosmos";
+import { cleanCosmosProps, cleanCosmosPropsForItems } from "../lib/clean";
 
 export class CosmosContainer {
   private name: string;
@@ -28,7 +29,7 @@ export class CosmosContainer {
    * @param feedOptions Cosmos feed options
    * @returns Array of typed items
    */
-  public async getItems<T>(
+  public async getItems<T extends Record<string, any>>(
     query: SqlQuerySpec,
     feedOptions?: FeedOptions
   ): Promise<T[]> {
@@ -37,22 +38,20 @@ export class CosmosContainer {
       .fetchAll();
 
     if (result.resources && result.resources.length > 0) {
-      return result.resources;
+      return cleanCosmosPropsForItems(result.resources);
     }
 
     // return an empty array if no results are received from Cosmos
     return [] as T[];
   }
 
-  public async getItemsWithContinuationToken<T>(
+  public async getItemsWithContinuationToken<T extends Record<string, any>>(
     query: SqlQuerySpec,
     feedOptions?: FeedOptions
   ) {
-    const {
-      resources: items,
-      hasMoreResults,
-      continuationToken,
-    } = await this.container.items.query<T>(query, feedOptions).fetchNext();
+    const { resources, hasMoreResults, continuationToken } =
+      await this.container.items.query<T>(query, feedOptions).fetchNext();
+    const items = cleanCosmosPropsForItems(resources ?? []);
     return { items, hasMoreResults, continuationToken };
   }
 
@@ -67,7 +66,7 @@ export class CosmosContainer {
     const { resource: item } = await this.container
       .item(id, partitionKey || id)
       .read();
-    return item;
+    return cleanCosmosProps(item);
   }
 
   /**
@@ -90,17 +89,19 @@ export class CosmosContainer {
     return insertedItem;
   }
 
-  public async getItemsByIds<T>(ids: readonly string[]) {
+  public async getItemsByIds<T extends Record<string, any>>(
+    ids: readonly string[]
+  ) {
     const querySpec = {
       query: "select * from c where ARRAY_CONTAINS(@ids, c.id)",
       parameters: [{ name: "@ids", value: ids }],
     };
-    const response = await this.container.items.query<T>(querySpec).fetchAll();
-    return response.resources;
+    const result = await this.container.items.query<T>(querySpec).fetchAll();
+    return cleanCosmosPropsForItems(result.resources);
   }
 
-  public async getItem<T>(query: SqlQuerySpec) {
+  public async getItem<T extends Record<string, any>>(query: SqlQuerySpec) {
     const response = await this.container.items.query<T>(query).fetchAll();
-    return response.resources[0];
+    return cleanCosmosProps(response.resources[0]);
   }
 }

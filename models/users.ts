@@ -8,6 +8,10 @@ const provider = createProvider();
 
 const loader = createLoader(provider.userService.getUsersByIds);
 
+export async function getUsers(ids: string[]): Promise<Array<User | null>> {
+  return loader.findManyByIds(ids);
+}
+
 export async function getUserById(id: string): Promise<User | null> {
   return loader.findOneById(id);
 }

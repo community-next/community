@@ -8,7 +8,6 @@ import {
   RoomType,
 } from "@community-next/provider";
 import { CosmosDB, containers, CosmosContainer } from "./db";
-import { cleanCosmosPropsForItems } from "./lib/clean";
 
 export class RoomService implements IRoomService {
   private rooms: CosmosContainer;
@@ -24,7 +23,7 @@ export class RoomService implements IRoomService {
 
   async getRooms(ids: string[]): Promise<Room[]> {
     const rooms = await this.rooms.getItemsByIds<Room>(ids);
-    return cleanCosmosPropsForItems(rooms);
+    return rooms;
   }
 
   async getRoomIdBySlug(slug: string): Promise<string | null> {
