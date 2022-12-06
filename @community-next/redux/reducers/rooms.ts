@@ -19,9 +19,12 @@ export const roomsSlice = createSlice({
       const { rooms } = action.payload;
       state.roomIds = rooms.map((room) => room.id);
     },
+    changeRoom: (state, action: PayloadAction<string>) => {
+      state.currentRoomId = action.payload;
+    },
   },
 });
 
-export const { initRooms } = roomsSlice.actions;
+export const { initRooms, changeRoom } = roomsSlice.actions;
 
 export default roomsSlice.reducer;

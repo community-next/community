@@ -1,3 +1,4 @@
+import type { User, Message } from "@community-next/provider";
 import { createDraftSafeSelector } from "@reduxjs/toolkit";
 import { AppState } from "../store";
 
@@ -5,33 +6,31 @@ export const selectCurrentRoomId = (state: AppState) =>
   state.rooms.currentRoomId;
 export const selectMessageMap = (state: AppState) => state.entities.messages;
 export const selectUserMap = (state: AppState) => state.entities.users;
-export const selectMessageIdsInRooms = (state: AppState) =>
-  state.messages.messageIdsInRooms;
+export const selectMessagesInRooms = (state: AppState) =>
+  state.messages.messagesInRooms;
 
-export const currentRoomSelector = createDraftSafeSelector(
+export const roomMessagesSelector = createDraftSafeSelector(
   selectCurrentRoomId,
   selectUserMap,
   selectMessageMap,
-  selectMessageIdsInRooms,
-  (roomId, userMap, messageMap, messageIdsInRooms) => {
+  selectMessagesInRooms,
+  (roomId, userMap, messageMap, messagesInRooms) => {
     if (!roomId) {
-      return null;
+      return [];
     }
-    const messageIds = messageIdsInRooms.get(roomId) ?? [];
-    const messages = messageIds
-      .map((id) => {
-        const message = messageMap.get(id);
-        if (!message) {
-          return undefined;
-        }
+    const messageIds = messagesInRooms[roomId]?.messageIds ?? [];
+    const messages: Array<{ message: Message; user: User | undefined }> = [];
 
-        const user = userMap.get(message.userId);
-        return {
+    messageIds.forEach((id) => {
+      const message = messageMap[id];
+      if (message) {
+        const user = userMap[message.userId];
+        messages.push({
           user,
           message,
-        };
-      })
-      .filter(Boolean);
+        });
+      }
+    });
 
     return messages;
   }

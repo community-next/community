@@ -1,15 +1,21 @@
-import { Flex } from "@community-next/design-system";
 import React from "react";
-import { configureAbly, useChannel } from "@ably-labs/react-hooks";
+import { Box, Flex } from "@community-next/design-system";
+import { roomMessagesSelector, useAppSelector } from "@community-next/redux";
 
 export interface MessagesProps {
   roomId: string;
 }
 
 export const Messages: React.FC<MessagesProps> = ({ roomId }) => {
-  const [channel] = useChannel(roomId, (message) => {
-    console.log("new message", message);
-  });
+  const messages = useAppSelector(roomMessagesSelector);
 
-  return <Flex className="flex-1"></Flex>;
+  return (
+    <Flex className="flex-1">
+      <Box>
+        {messages.map(({ user, message }) => (
+          <Flex key={message.id}>{JSON.stringify(message)}</Flex>
+        ))}
+      </Box>
+    </Flex>
+  );
 };

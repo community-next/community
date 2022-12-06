@@ -1,11 +1,11 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import type { User, Message, Room } from "@community-next/provider";
-import { createNewMessage, messagesSlice } from "./messages";
+import { createNewMessage, fetchMessages, messagesSlice } from "./messages";
 
 const initialState = {
-  messages: new Map<string, Message>(),
-  users: new Map<string, User>(),
-  rooms: new Map<string, Room>(),
+  messages: {} as Record<string, Message>,
+  users: {} as Record<string, User>,
+  rooms: {} as Record<string, Room>,
 };
 
 function updateMessages(
@@ -14,10 +14,10 @@ function updateMessages(
 ) {
   const { messages, users } = action.payload;
   messages.forEach((message) => {
-    state.messages.set(message.id, message);
+    state.messages[message.id] = message;
   });
   users.forEach((user) => {
-    state.users.set(user.id, user);
+    state.users[user.id] = user;
   });
 }
 
@@ -27,24 +27,24 @@ export const entitiesSlice = createSlice({
   reducers: {
     setUser: (state, action: PayloadAction<{ user: User }>) => {
       const { user } = action.payload;
-      state.users.set(user.id, user);
+      state.users[user.id] = user;
     },
     setMessage: (state, action: PayloadAction<{ message: Message }>) => {
       const { message } = action.payload;
-      state.messages.set(message.id, message);
+      state.messages[message.id] = message;
     },
     setRoom: (state, action: PayloadAction<{ room: Room }>) => {
       const { room } = action.payload;
-      state.rooms.set(room.id, room);
+      state.rooms[room.id] = room;
     },
   },
   extraReducers: (builder) => {
     builder
-      .addCase(messagesSlice.actions.loadOldMessages, updateMessages)
+      .addCase(fetchMessages.fulfilled, updateMessages)
       .addCase(messagesSlice.actions.loadNewMessages, updateMessages)
       .addCase(createNewMessage.fulfilled, (state, action) => {
         const message = action.payload;
-        state.messages.set(message.id, message);
+        state.messages[message.id] = message;
       });
   },
 });

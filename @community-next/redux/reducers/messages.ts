@@ -8,9 +8,124 @@ import type {
 } from "@community-next/provider";
 import { generateUUID, getTimestampInSeconds } from "@community-next/utils";
 
+interface MessagesInRoom {
+  messageIds: string[];
+  continuationToken: string | undefined;
+  hasMoreResults: boolean | undefined;
+}
+
 const initialState = {
-  messageIdsInRooms: new Map<string, Array<string>>(),
+  messagesInRooms: {} as Record<string, MessagesInRoom>,
 };
+
+export const messagesSlice = createSlice({
+  name: "messages",
+  initialState,
+  reducers: {
+    loadNewMessages: (
+      state,
+      action: PayloadAction<{
+        roomId: string;
+        messages: Message[];
+        users: User[];
+      }>
+    ) => {
+      const { roomId, messages } = action.payload;
+      const messagesInRoom = state.messagesInRooms[roomId] ?? {
+        messageIds: [],
+        continuationToken: undefined,
+        hasMoreResults: undefined,
+      };
+      const messageIds = messagesInRoom.messageIds;
+      const set = new Set(messageIds);
+      messages.forEach((message) => {
+        if (!set.has(message.id)) {
+          messageIds.push(message.id);
+        }
+      });
+
+      state.messagesInRooms[roomId] = messagesInRoom;
+    },
+
+    replaceMessage: (
+      state,
+      action: PayloadAction<{
+        roomId: string;
+        oldMessageId: string;
+        newMessageId: string;
+      }>
+    ) => {
+      const { roomId, oldMessageId, newMessageId } = action.payload;
+      const messagesInRoom = state.messagesInRooms[roomId] ?? {
+        messageIds: [],
+        continuationToken: undefined,
+        hasMoreResults: undefined,
+      };
+      const messageIds = messagesInRoom.messageIds;
+      const index = messageIds.indexOf(oldMessageId);
+      if (index !== -1) {
+        messageIds[index] = newMessageId;
+      }
+      state.messagesInRooms[roomId] = messagesInRoom;
+    },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(fetchMessages.fulfilled, (state, action) => {
+      const { roomId, messages } = action.payload;
+      const messagesInRoom = state.messagesInRooms[roomId] ?? {
+        messageIds: [],
+        continuationToken: undefined,
+        hasMoreResults: undefined,
+      };
+
+      const messageIds = messagesInRoom.messageIds;
+      const set = new Set(messageIds);
+
+      for (let i = messages.length - 1; i >= 0; i--) {
+        const message = messages[i];
+        if (!set.has(message.id)) {
+          messageIds.unshift(message.id);
+        }
+      }
+      state.messagesInRooms[roomId] = messagesInRoom;
+    });
+  },
+});
+
+export const { loadNewMessages, replaceMessage } = messagesSlice.actions;
+
+export const fetchMessages = createAsyncThunk(
+  "messages/fetchMessages",
+  async (
+    params: {
+      roomId: string;
+      continuationToken: string | undefined;
+    },
+    thunkAPI
+  ) => {
+    const { roomId, continuationToken } = params;
+    const res = await fetch(
+      `/api/rooms/${roomId}/messages${
+        continuationToken ? `?continuationToken=${continuationToken}` : ""
+      }`,
+      {
+        credentials: "include",
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    const json = await res.json();
+    const { messages, users, hasMoreResults } = json as {
+      messages: Message[];
+      users: User[];
+      hasMoreResults: boolean;
+    };
+    return { roomId, messages, users, hasMoreResults };
+  }
+);
 
 export const createNewMessage = createAsyncThunk<
   Message,
@@ -21,11 +136,6 @@ export const createNewMessage = createAsyncThunk<
     format: ContentFormat;
   }
 >("messages/newMessage", async (payload, thunkAPI) => {
-  // const response = await fetch(`https://reqres.in/api/users/${userId}`, {
-  //   signal: thunkAPI.signal,
-  // })
-  // return await response.json()
-
   const { dispatch } = thunkAPI;
   const { roomId, user, content, format } = payload;
   const timestamp = getTimestampInSeconds();
@@ -47,7 +157,7 @@ export const createNewMessage = createAsyncThunk<
   dispatch(loadNewMessages({ roomId, messages: [message], users: [user] }));
 
   try {
-    const res = await fetch(`/api/messages/${roomId}/new`, {
+    const res = await fetch(`/api/rooms/${roomId}/message`, {
       credentials: "include",
       method: "POST",
       headers: {
@@ -78,72 +188,5 @@ export const createNewMessage = createAsyncThunk<
     return message;
   }
 });
-
-export const messagesSlice = createSlice({
-  name: "messages",
-  initialState,
-  reducers: {
-    loadNewMessages: (
-      state,
-      action: PayloadAction<{
-        roomId: string;
-        messages: Message[];
-        users: User[];
-      }>
-    ) => {
-      const { roomId, messages } = action.payload;
-      const messageIds = state.messageIdsInRooms.get(roomId) ?? [];
-      const set = new Set(messageIds);
-      messages.forEach((message) => {
-        if (!set.has(message.id)) {
-          messageIds.push(message.id);
-        }
-      });
-      state.messageIdsInRooms.set(roomId, messageIds);
-    },
-
-    loadOldMessages: (
-      state,
-      action: PayloadAction<{
-        roomId: string;
-        messages: Message[];
-        users: User[];
-      }>
-    ) => {
-      const { roomId, messages } = action.payload;
-
-      const messageIds = state.messageIdsInRooms.get(roomId) ?? [];
-      const set = new Set(messageIds);
-
-      for (let i = messages.length - 1; i >= 0; i--) {
-        const message = messages[i];
-        if (!set.has(message.id)) {
-          messageIds.unshift(message.id);
-        }
-      }
-      state.messageIdsInRooms.set(roomId, messageIds);
-    },
-
-    replaceMessage: (
-      state,
-      action: PayloadAction<{
-        roomId: string;
-        oldMessageId: string;
-        newMessageId: string;
-      }>
-    ) => {
-      const { roomId, oldMessageId, newMessageId } = action.payload;
-      const messageIds = state.messageIdsInRooms.get(roomId) ?? [];
-      const index = messageIds.indexOf(oldMessageId);
-      if (index !== -1) {
-        messageIds[index] = newMessageId;
-      }
-      state.messageIdsInRooms.set(roomId, messageIds);
-    },
-  },
-});
-
-export const { loadNewMessages, loadOldMessages, replaceMessage } =
-  messagesSlice.actions;
 
 export default messagesSlice.reducer;
