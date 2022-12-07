@@ -46,53 +46,50 @@ export const messagesSlice = createSlice({
 
       state.messagesInRooms[roomId] = messagesInRoom;
     },
-
-    replaceMessage: (
-      state,
-      action: PayloadAction<{
-        roomId: string;
-        oldMessageId: string;
-        newMessageId: string;
-      }>
-    ) => {
-      const { roomId, oldMessageId, newMessageId } = action.payload;
-      const messagesInRoom = state.messagesInRooms[roomId] ?? {
-        messageIds: [],
-        continuationToken: undefined,
-        hasMoreResults: undefined,
-      };
-      const messageIds = messagesInRoom.messageIds;
-      const index = messageIds.indexOf(oldMessageId);
-      if (index !== -1) {
-        messageIds[index] = newMessageId;
-      }
-      state.messagesInRooms[roomId] = messagesInRoom;
-    },
   },
   extraReducers: (builder) => {
-    builder.addCase(fetchMessages.fulfilled, (state, action) => {
-      const { roomId, messages } = action.payload;
-      const messagesInRoom = state.messagesInRooms[roomId] ?? {
-        messageIds: [],
-        continuationToken: undefined,
-        hasMoreResults: undefined,
-      };
+    builder
+      .addCase(fetchMessages.fulfilled, (state, action) => {
+        const { roomId, messages } = action.payload;
+        const messagesInRoom = state.messagesInRooms[roomId] ?? {
+          messageIds: [],
+          continuationToken: undefined,
+          hasMoreResults: undefined,
+        };
 
-      const messageIds = messagesInRoom.messageIds;
-      const set = new Set(messageIds);
+        const messageIds = messagesInRoom.messageIds;
+        const set = new Set(messageIds);
 
-      for (let i = messages.length - 1; i >= 0; i--) {
-        const message = messages[i];
-        if (!set.has(message.id)) {
-          messageIds.unshift(message.id);
+        for (let i = messages.length - 1; i >= 0; i--) {
+          const message = messages[i];
+          if (!set.has(message.id)) {
+            messageIds.unshift(message.id);
+          }
         }
-      }
-      state.messagesInRooms[roomId] = messagesInRoom;
-    });
+        state.messagesInRooms[roomId] = messagesInRoom;
+      })
+      .addCase(createNewMessage.fulfilled, (state, action) => {
+        const { roomId, draft, message } = action.payload;
+        if (!message) {
+          return;
+        }
+
+        const messagesInRoom = state.messagesInRooms[roomId] ?? {
+          messageIds: [],
+          continuationToken: undefined,
+          hasMoreResults: undefined,
+        };
+        const messageIds = messagesInRoom.messageIds;
+        const index = messageIds.indexOf(draft.id);
+        if (index !== -1) {
+          messageIds[index] = message.id;
+        }
+        state.messagesInRooms[roomId] = messagesInRoom;
+      });
   },
 });
 
-export const { loadNewMessages, replaceMessage } = messagesSlice.actions;
+export const { loadNewMessages } = messagesSlice.actions;
 
 export const fetchMessages = createAsyncThunk(
   "messages/fetchMessages",
@@ -128,7 +125,7 @@ export const fetchMessages = createAsyncThunk(
 );
 
 export const createNewMessage = createAsyncThunk<
-  Message,
+  { roomId: string; draft: MessageDraft; message?: Message },
   {
     roomId: string;
     user: User;
@@ -140,7 +137,7 @@ export const createNewMessage = createAsyncThunk<
   const { roomId, user, content, format } = payload;
   const timestamp = getTimestampInSeconds();
 
-  const message: MessageDraft = {
+  const draft: MessageDraft = {
     id: generateUUID(),
     roomId: roomId,
     userId: user.id,
@@ -154,10 +151,10 @@ export const createNewMessage = createAsyncThunk<
   };
 
   // add draft to the message list
-  dispatch(loadNewMessages({ roomId, messages: [message], users: [user] }));
+  dispatch(loadNewMessages({ roomId, messages: [draft], users: [user] }));
 
   try {
-    const res = await fetch(`/api/rooms/${roomId}/message`, {
+    const res = await fetch(`/api/rooms/${roomId}/messages`, {
       credentials: "include",
       method: "POST",
       headers: {
@@ -169,23 +166,18 @@ export const createNewMessage = createAsyncThunk<
         format,
       }),
     });
-    message.status = "sent";
-    const newMessage = await res.json();
+    draft.status = "sent";
+    const message = await res.json();
 
-    // replace draft with this message
-    dispatch(
-      replaceMessage({
-        roomId,
-        oldMessageId: message.id,
-        newMessageId: newMessage.id,
-      })
-    );
-
-    return newMessage as Message;
+    return {
+      roomId,
+      draft,
+      message,
+    };
   } catch (ex) {
     // set message's status
-    message.status = "failed";
-    return message;
+    draft.status = "failed";
+    return { roomId, draft, message: undefined };
   }
 });
 

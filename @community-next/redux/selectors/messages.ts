@@ -1,11 +1,10 @@
 import type { User, Message } from "@community-next/provider";
 import { createDraftSafeSelector } from "@reduxjs/toolkit";
 import { AppState } from "../store";
+import { selectMessageMap, selectUserMap } from "./entities";
 
 export const selectCurrentRoomId = (state: AppState) =>
   state.rooms.currentRoomId;
-export const selectMessageMap = (state: AppState) => state.entities.messages;
-export const selectUserMap = (state: AppState) => state.entities.users;
 export const selectMessagesInRooms = (state: AppState) =>
   state.messages.messagesInRooms;
 

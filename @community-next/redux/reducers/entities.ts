@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import type { User, Message, Room } from "@community-next/provider";
 import { createNewMessage, fetchMessages, messagesSlice } from "./messages";
+import { authenticationSlice } from "./authentication";
 
 const initialState = {
   messages: {} as Record<string, Message>,
@@ -19,6 +20,26 @@ function updateMessages(
   users.forEach((user) => {
     state.users[user.id] = user;
   });
+}
+
+function updateUser(
+  state: typeof initialState,
+  action: PayloadAction<{ user: User }>
+) {
+  const { user } = action.payload;
+  if (user) {
+    state.users[user.id] = user;
+  }
+}
+
+function updateMessage(
+  state: typeof initialState,
+  action: PayloadAction<{ message: Message }>
+) {
+  const { message } = action.payload;
+  if (message) {
+    state.messages[message.id] = message;
+  }
 }
 
 export const entitiesSlice = createSlice({
@@ -42,9 +63,12 @@ export const entitiesSlice = createSlice({
     builder
       .addCase(fetchMessages.fulfilled, updateMessages)
       .addCase(messagesSlice.actions.loadNewMessages, updateMessages)
+      .addCase(authenticationSlice.actions.signedIn, updateUser)
       .addCase(createNewMessage.fulfilled, (state, action) => {
-        const message = action.payload;
-        state.messages[message.id] = message;
+        const { message } = action.payload;
+        if (message) {
+          state.messages[message.id] = message;
+        }
       });
   },
 });

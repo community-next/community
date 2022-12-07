@@ -3,7 +3,7 @@ import React, { useEffect } from "react";
 import { Provider } from "react-redux";
 import { configureAbly, useChannel } from "@ably-labs/react-hooks";
 import { Flex, Text } from "@community-next/design-system";
-import { store, useAppDispatch } from "@community-next/redux";
+import { signedIn, store, useAppDispatch } from "@community-next/redux";
 import { Messages } from "./Messages";
 import { Composer } from "./Composer";
 import { User } from "@community-next/provider";
@@ -18,7 +18,7 @@ configureAbly({
   authUrl: "/api/ws/token-request",
 });
 
-export const RoomContainer: React.FC<RoomProps> = ({ roomId }) => {
+export const RoomContainer: React.FC<RoomProps> = ({ roomId, user }) => {
   const dispatch = useAppDispatch();
   const [channel] = useChannel(roomId, (message) => {
     console.log("new message", message);
@@ -28,6 +28,12 @@ export const RoomContainer: React.FC<RoomProps> = ({ roomId }) => {
     dispatch(changeRoom(roomId));
     dispatch(fetchMessages({ roomId, continuationToken: undefined }));
   }, [dispatch, roomId]);
+
+  useEffect(() => {
+    if (user) {
+      dispatch(signedIn({ user }));
+    }
+  }, [dispatch, user]);
 
   return (
     <Flex direction="column" className="h-screen">
@@ -46,7 +52,7 @@ export const RoomContainer: React.FC<RoomProps> = ({ roomId }) => {
         </Flex>
       </Flex>
       <Flex className="h-[160px] p-6">
-        <Composer roomId={roomId} />
+        <Composer roomId={roomId} user={user} />
       </Flex>
     </Flex>
   );

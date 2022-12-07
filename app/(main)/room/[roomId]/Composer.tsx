@@ -1,13 +1,22 @@
-import { Flex, styled } from "@community-next/design-system";
 import React, { useCallback, useState } from "react";
+import { Flex, styled } from "@community-next/design-system";
+import {
+  createNewMessage,
+  currentUserSelector,
+  roomMessagesSelector,
+  useAppDispatch,
+  useAppSelector,
+} from "@community-next/redux";
+import type { User } from "@community-next/provider";
 
 export interface ComposerProps {
   roomId: string;
+  user: User | null;
 }
 
-export const Composer: React.FC<ComposerProps> = ({ roomId }) => {
+export const Composer: React.FC<ComposerProps> = ({ roomId, user }) => {
   const [content, setContent] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const dispatch = useAppDispatch();
 
   const handleValueChanged = (e: React.FormEvent<HTMLTextAreaElement>) => {
     const newValue = e.currentTarget.value;
@@ -19,36 +28,16 @@ export const Composer: React.FC<ComposerProps> = ({ roomId }) => {
       if (e.key !== "Enter" || e.shiftKey) {
         return;
       }
-
+      if (!user) {
+        return;
+      }
       e.preventDefault();
 
-      const body = {
-        content,
-        format: 1,
-      };
+      dispatch(createNewMessage({ roomId, user, content, format: 0 }));
+
       setContent("");
-      setIsLoading(true);
-      fetch(`/api/messages/${roomId}/new`, {
-        credentials: "include",
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(body),
-      })
-        .then((res) => res.json())
-        .then((message) => {
-          console.log("#sent", message);
-        })
-        .catch((ex) => {
-          console.error("failed to send", ex);
-        })
-        .finally(() => {
-          setIsLoading(false);
-        });
     },
-    [content, roomId]
+    [content, dispatch, roomId, user]
   );
 
   return (
@@ -59,7 +48,7 @@ export const Composer: React.FC<ComposerProps> = ({ roomId }) => {
         placeholder="Type your message"
         onChange={handleValueChanged}
         onKeyDown={handleKeywordKeyDown}
-        disabled={isLoading}
+        disabled={!user}
         value={content}
       />
     </Flex>

@@ -3,6 +3,7 @@ import { configureStore, ThunkAction, Action } from "@reduxjs/toolkit";
 import entitiesReducer from "./reducers/entities";
 import messagesReducer from "./reducers/messages";
 import roomsReducer from "./reducers/rooms";
+import authenticationReducer from "./reducers/authentication";
 
 export function makeStore() {
   return configureStore({
@@ -10,6 +11,7 @@ export function makeStore() {
       entities: entitiesReducer,
       messages: messagesReducer,
       rooms: roomsReducer,
+      authentication: authenticationReducer,
     },
   });
 }
