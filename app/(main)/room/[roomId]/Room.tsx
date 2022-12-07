@@ -3,7 +3,12 @@ import React, { useEffect } from "react";
 import { Provider } from "react-redux";
 import { configureAbly, useChannel } from "@ably-labs/react-hooks";
 import { Flex, Text } from "@community-next/design-system";
-import { signedIn, store, useAppDispatch } from "@community-next/redux";
+import {
+  loadNewMessages,
+  signedIn,
+  store,
+  useAppDispatch,
+} from "@community-next/redux";
 import { Messages } from "./Messages";
 import { Composer } from "./Composer";
 import { User } from "@community-next/provider";
@@ -20,8 +25,11 @@ configureAbly({
 
 export const RoomContainer: React.FC<RoomProps> = ({ roomId, user }) => {
   const dispatch = useAppDispatch();
-  const [channel] = useChannel(roomId, (message) => {
-    console.log("new message", message);
+  const [channel] = useChannel(roomId, (msg) => {
+    const {
+      data: { message, user },
+    } = msg;
+    dispatch(loadNewMessages({ roomId, messages: [message], users: [user] }));
   });
 
   useEffect(() => {

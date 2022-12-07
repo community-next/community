@@ -34,7 +34,7 @@ export const MessageItem: React.FC<MessageItemProps> = ({
           {message.content}
         </Box>
         <Text numberOfLines={1} textSize="sm" color="content3">
-          {timeAgo.format(message.createdAt, "twitter")}
+          {timeAgo.format(message.createdAt * 1000, "twitter")}
         </Text>
       </Stack>
     </Flex>
