@@ -107,14 +107,14 @@ export function createStyledComponent<
               hoverColor === "yellow",
 
             rounded: rounded === "base",
-            "rounded-none": rounded === "none",
+            "rounded-none": rounded === "none" || rounded === false,
             "rounded-sm": rounded === "sm",
             "rounded-md": rounded === "md",
             "rounded-lg": rounded === "lg" || rounded === true,
             "rounded-full": rounded === "full",
 
             border: border === true,
-            "border-0": border === "none",
+            "border-0": border === "none" || border === false,
             "border-2": border === "2",
 
             "border-t": borderTop === true,

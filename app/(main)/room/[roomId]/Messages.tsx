@@ -1,6 +1,7 @@
 import React from "react";
-import { Box, Flex } from "@community-next/design-system";
+import { Box, Flex, Stack } from "@community-next/design-system";
 import { roomMessagesSelector, useAppSelector } from "@community-next/redux";
+import { MessageItem } from "./MessageItem";
 
 export interface MessagesProps {
   roomId: string;
@@ -11,11 +12,11 @@ export const Messages: React.FC<MessagesProps> = ({ roomId }) => {
 
   return (
     <Flex className="flex-1">
-      <Box>
+      <Stack space={4} className="p-3">
         {messages.map(({ user, message }) => (
-          <Flex key={message.id}>{JSON.stringify(message)}</Flex>
+          <MessageItem user={user} message={message} key={message.id} />
         ))}
-      </Box>
+      </Stack>
     </Flex>
   );
 };

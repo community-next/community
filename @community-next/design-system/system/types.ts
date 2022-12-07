@@ -70,8 +70,16 @@ export type TextColor =
   | "red"
   | "yellow";
 
-export type Rounded = true | "none" | "sm" | "base" | "md" | "lg" | "full";
-export type Border = true | "none" | "2";
+export type Rounded =
+  | true
+  | false
+  | "none"
+  | "sm"
+  | "base"
+  | "md"
+  | "lg"
+  | "full";
+export type Border = true | false | "none" | "2";
 export type FontWeight = "normal" | "medium" | "semibold" | "bold";
 export type TextSize = "xs" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "4xl";
 export type Leading =
