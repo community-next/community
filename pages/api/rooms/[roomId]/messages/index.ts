@@ -15,7 +15,7 @@ async function handlePost(
   currentUser: User | null
 ) {
   const roomId = req.query.roomId as string;
-  const id = (req.query.id ?? null) as string | null;
+  const id = (req.body.id ?? null) as string | null;
   const content = (req.body.content ?? "") as string;
   const format = (req.body.format ?? 0) as ContentFormat;
   const ipAddress = requestIp.getClientIp(req) ?? "127.0.0.1";
@@ -56,6 +56,7 @@ async function handlePost(
   });
 
   return res.json({
+    draftId: id,
     message,
     user: currentUser,
   });
@@ -73,7 +74,7 @@ async function handleGet(
     | string
     | undefined;
 
-  const messages = await getMessages(roomId, 50, continuationToken);
+  const messages = await getMessages(roomId, 20, continuationToken);
 
   res.status(200).json(messages);
 }

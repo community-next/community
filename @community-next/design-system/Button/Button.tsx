@@ -87,8 +87,7 @@ export type IconButtonProps = Omit<ButtonProps, "iconOnly"> & {
 };
 
 export const IconButton = forwardRef<IconButtonProps, "button">(
-  (props, ref) => {
-    const { size: sizeProp, Icon, children } = props;
+  ({ size: sizeProp, Icon, children, ...props }, ref) => {
     let size = "16";
     if (sizeProp === "lg") {
       size = "20";
@@ -97,7 +96,7 @@ export const IconButton = forwardRef<IconButtonProps, "button">(
     }
 
     return (
-      <Button iconOnly {...props} ref={ref}>
+      <Button iconOnly size={sizeProp} {...props} ref={ref}>
         {Icon ? <Icon size={size} /> : children}
       </Button>
     );

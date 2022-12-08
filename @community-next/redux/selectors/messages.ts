@@ -15,23 +15,35 @@ export const roomMessagesSelector = createDraftSafeSelector(
   selectMessageMap,
   selectMessagesInRooms,
   (roomId, userMap, messageMap, messagesInRooms) => {
-    if (!roomId) {
-      return [];
+    const messagesInRoom = messagesInRooms[roomId ?? ""];
+    if (!messagesInRoom) {
+      return {
+        roomId,
+        messageItems: [],
+        hasMoreResults: undefined,
+        loadingMore: undefined,
+      };
     }
-    const messageIds = messagesInRooms[roomId]?.messageIds ?? [];
-    const messages: Array<{ message: Message; user: User }> = [];
+
+    const { messageIds, hasMoreResults, loadingMore } = messagesInRoom;
+    const messageItems: Array<{ message: Message; user: User }> = [];
 
     messageIds.forEach((id) => {
       const message = messageMap[id];
       if (message) {
         const user = userMap[message.userId] ?? anonymousUser;
-        messages.push({
+        messageItems.push({
           user,
           message,
         });
       }
     });
 
-    return messages;
+    return {
+      roomId,
+      messageItems,
+      hasMoreResults,
+      loadingMore,
+    };
   }
 );

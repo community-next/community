@@ -13,6 +13,7 @@ export function makeStore() {
       rooms: roomsReducer,
       authentication: authenticationReducer,
     },
+    devTools: true,
   });
 }
 

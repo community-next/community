@@ -8,16 +8,29 @@ import type {
 } from "@community-next/provider";
 import { generateUUID, getTimestampInSeconds } from "@community-next/utils";
 import { updateMessage } from "./entities";
+import { AppState } from "../store";
 
 interface MessagesInRoom {
   messageIds: string[];
-  continuationToken: string | undefined;
-  hasMoreResults: boolean | undefined;
+  continuationToken?: string;
+  hasMoreResults?: boolean;
+  loadingMore?: boolean;
 }
 
 const initialState = {
   messagesInRooms: {} as Record<string, MessagesInRoom>,
 };
+
+function getMessagesInRoom(
+  state: typeof initialState,
+  roomId: string
+): MessagesInRoom {
+  return (
+    state.messagesInRooms[roomId] ?? {
+      messageIds: [],
+    }
+  );
+}
 
 export const messagesSlice = createSlice({
   name: "messages",
@@ -32,11 +45,7 @@ export const messagesSlice = createSlice({
       }>
     ) => {
       const { roomId, messages } = action.payload;
-      const messagesInRoom = state.messagesInRooms[roomId] ?? {
-        messageIds: [],
-        continuationToken: undefined,
-        hasMoreResults: undefined,
-      };
+      const messagesInRoom = getMessagesInRoom(state, roomId);
       const messageIds = messagesInRoom.messageIds;
       const set = new Set(messageIds);
       messages.forEach((message) => {
@@ -47,37 +56,29 @@ export const messagesSlice = createSlice({
 
       state.messagesInRooms[roomId] = messagesInRoom;
     },
-    replaceMessage: (
+    setLoadingMoreStatus: (
       state,
       action: PayloadAction<{
         roomId: string;
-        oldMessageId: string;
-        newMessageId: string;
+        loadingMore: boolean;
       }>
     ) => {
-      const { roomId, oldMessageId, newMessageId } = action.payload;
-      const messagesInRoom = state.messagesInRooms[roomId] ?? {
-        messageIds: [],
-        continuationToken: undefined,
-        hasMoreResults: undefined,
-      };
-      const messageIds = messagesInRoom.messageIds;
-      const index = messageIds.indexOf(oldMessageId);
-      if (index !== -1) {
-        messageIds[index] = newMessageId;
-      }
+      const { roomId, loadingMore } = action.payload;
+      const messagesInRoom = getMessagesInRoom(state, roomId);
+      messagesInRoom.loadingMore = loadingMore;
       state.messagesInRooms[roomId] = messagesInRoom;
     },
   },
   extraReducers: (builder) => {
     builder
       .addCase(fetchMessages.fulfilled, (state, action) => {
-        const { roomId, messages } = action.payload;
-        const messagesInRoom = state.messagesInRooms[roomId] ?? {
-          messageIds: [],
-          continuationToken: undefined,
-          hasMoreResults: undefined,
-        };
+        if (!action.payload) {
+          return;
+        }
+
+        const { roomId, messages, hasMoreResults, continuationToken } =
+          action.payload;
+        const messagesInRoom = getMessagesInRoom(state, roomId);
 
         const messageIds = messagesInRoom.messageIds;
         const set = new Set(messageIds);
@@ -88,49 +89,70 @@ export const messagesSlice = createSlice({
             messageIds.unshift(message.id);
           }
         }
+        messagesInRoom.continuationToken = continuationToken;
+        messagesInRoom.loadingMore = false;
+        messagesInRoom.hasMoreResults = hasMoreResults;
         state.messagesInRooms[roomId] = messagesInRoom;
       })
-      .addCase(sendMessage.fulfilled, (state, action) => {
-        // const { roomId, draft, message } = action.payload;
-        // if (!message) {
-        //   return;
-        // }
+      .addCase(newMessage.fulfilled, (state, action) => {
+        const { roomId, message, draftId, user } = action.payload;
+        const messagesInRoom = getMessagesInRoom(state, roomId);
+        const messageIds = messagesInRoom.messageIds;
+        const index = messageIds.findIndex((id) => id === draftId);
+        if (index !== -1) {
+          messageIds[index] = message.id;
+        } else {
+          messageIds.push(message.id);
+        }
+        messagesInRoom.messageIds = messageIds;
+        state.messagesInRooms[roomId] = messagesInRoom;
       });
   },
 });
 
-export const { loadNewMessages, replaceMessage } = messagesSlice.actions;
+export const { loadNewMessages, setLoadingMoreStatus } = messagesSlice.actions;
 
 export const fetchMessages = createAsyncThunk(
   "messages/fetchMessages",
-  async (
-    params: {
-      roomId: string;
-      continuationToken: string | undefined;
-    },
-    thunkAPI
-  ) => {
-    const { roomId, continuationToken } = params;
-    const res = await fetch(
-      `/api/rooms/${roomId}/messages${
-        continuationToken ? `?continuationToken=${continuationToken}` : ""
-      }`,
-      {
-        credentials: "include",
-        method: "GET",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-      }
-    );
-    const json = await res.json();
-    const { messages, users, hasMoreResults } = json as {
-      messages: Message[];
-      users: User[];
-      hasMoreResults: boolean;
-    };
-    return { roomId, messages, users, hasMoreResults };
+  async (roomId: string, thunkAPI) => {
+    const { getState, dispatch } = thunkAPI;
+    const state = getState() as AppState;
+
+    const messagesInRoom = getMessagesInRoom(state.messages, roomId);
+    const { loadingMore, continuationToken: token } = messagesInRoom;
+    // can't load if it's loading
+    if (loadingMore) {
+      return;
+    }
+
+    dispatch(setLoadingMoreStatus({ roomId, loadingMore: true }));
+    try {
+      const res = await fetch(
+        `/api/rooms/${roomId}/messages${
+          token ? `?continuationToken=${encodeURIComponent(token)}` : ""
+        }`,
+        {
+          credentials: "include",
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const json = await res.json();
+      const { messages, users, hasMoreResults, continuationToken } = json as {
+        messages: Message[];
+        users: User[];
+        hasMoreResults: boolean;
+        continuationToken: string;
+      };
+      return { roomId, messages, users, hasMoreResults, continuationToken };
+    } catch (err) {
+      return undefined;
+    } finally {
+      dispatch(setLoadingMoreStatus({ roomId, loadingMore: false }));
+    }
   }
 );
 
@@ -191,13 +213,6 @@ export const sendMessage = createAsyncThunk<
       status: "sent",
     };
     const { message, user } = await res.json();
-    dispatch(
-      replaceMessage({
-        roomId,
-        oldMessageId: draft.id,
-        newMessageId: message.id,
-      })
-    );
 
     return {
       roomId,
@@ -218,7 +233,12 @@ export const sendMessage = createAsyncThunk<
 
 // recieved a new message
 export const newMessage = createAsyncThunk<
-  undefined,
+  {
+    roomId: string;
+    draftId: string;
+    user: User;
+    message: Message;
+  },
   {
     roomId: string;
     draftId: string;
@@ -227,12 +247,7 @@ export const newMessage = createAsyncThunk<
   }
 >("messages/newMessage", async (data, thunkAPI) => {
   const { roomId, message, draftId, user } = data;
-  const { dispatch } = thunkAPI;
-  dispatch(
-    replaceMessage({ roomId, oldMessageId: draftId, newMessageId: message.id })
-  );
-  dispatch(loadNewMessages({ roomId, messages: [message], users: [user] }));
-  return undefined;
+  return { roomId, message, draftId, user };
 });
 
 export default messagesSlice.reducer;

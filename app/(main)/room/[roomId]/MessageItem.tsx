@@ -10,7 +10,7 @@ import {
   Stack,
   Text,
 } from "@community-next/design-system";
-import { Message, MessageDraft, User } from "@community-next/provider";
+import type { Message, MessageDraft, User } from "@community-next/provider";
 import { sendMessage, useAppDispatch } from "@community-next/redux";
 import { Avatar } from "@community-next/design-system/Avatar";
 import { BsFillExclamationCircleFill } from "react-icons/bs";
@@ -35,7 +35,7 @@ export const MessageItem: React.FC<MessageItemProps> = ({
     const isFailed = (message as MessageDraft).status === "failed";
     let backgroundColor: BackgroundColor = "gray";
     if (isMine) {
-      backgroundColor = isSending ? "gray-secondary" : "blue";
+      backgroundColor = isSending || isFailed ? "gray-secondary" : "blue";
     }
     const border: Border = !isMine;
     return { backgroundColor, border, isFailed };
