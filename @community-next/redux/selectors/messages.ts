@@ -1,5 +1,6 @@
 import type { User, Message } from "@community-next/provider";
 import { createDraftSafeSelector } from "@reduxjs/toolkit";
+import { anonymousUser } from "../anonymous";
 import { AppState } from "../store";
 import { selectMessageMap, selectUserMap } from "./entities";
 
@@ -18,12 +19,12 @@ export const roomMessagesSelector = createDraftSafeSelector(
       return [];
     }
     const messageIds = messagesInRooms[roomId]?.messageIds ?? [];
-    const messages: Array<{ message: Message; user: User | undefined }> = [];
+    const messages: Array<{ message: Message; user: User }> = [];
 
     messageIds.forEach((id) => {
       const message = messageMap[id];
       if (message) {
-        const user = userMap[message.userId];
+        const user = userMap[message.userId] ?? anonymousUser;
         messages.push({
           user,
           message,

@@ -48,7 +48,6 @@ export async function checkNewMessagePermission(
 export async function newMessage(
   room: Room,
   user: User,
-  id: string | null,
   content: string,
   format: ContentFormat,
   ipAddress: string
@@ -60,7 +59,7 @@ export async function newMessage(
   }
 
   const message: Message = {
-    id: id && uuidValidate(id) ? id : uuidv4(),
+    id: uuidv4(),
     roomId: room.id,
     userId: user.id,
     displayName: user.displayName,

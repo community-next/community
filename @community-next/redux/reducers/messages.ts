@@ -7,6 +7,7 @@ import type {
   MessageDraft,
 } from "@community-next/provider";
 import { generateUUID, getTimestampInSeconds } from "@community-next/utils";
+import { updateMessage } from "./entities";
 
 interface MessagesInRoom {
   messageIds: string[];
@@ -46,6 +47,27 @@ export const messagesSlice = createSlice({
 
       state.messagesInRooms[roomId] = messagesInRoom;
     },
+    replaceMessage: (
+      state,
+      action: PayloadAction<{
+        roomId: string;
+        oldMessageId: string;
+        newMessageId: string;
+      }>
+    ) => {
+      const { roomId, oldMessageId, newMessageId } = action.payload;
+      const messagesInRoom = state.messagesInRooms[roomId] ?? {
+        messageIds: [],
+        continuationToken: undefined,
+        hasMoreResults: undefined,
+      };
+      const messageIds = messagesInRoom.messageIds;
+      const index = messageIds.indexOf(oldMessageId);
+      if (index !== -1) {
+        messageIds[index] = newMessageId;
+      }
+      state.messagesInRooms[roomId] = messagesInRoom;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -68,28 +90,16 @@ export const messagesSlice = createSlice({
         }
         state.messagesInRooms[roomId] = messagesInRoom;
       })
-      .addCase(createNewMessage.fulfilled, (state, action) => {
-        const { roomId, draft, message } = action.payload;
-        if (!message) {
-          return;
-        }
-
-        const messagesInRoom = state.messagesInRooms[roomId] ?? {
-          messageIds: [],
-          continuationToken: undefined,
-          hasMoreResults: undefined,
-        };
-        const messageIds = messagesInRoom.messageIds;
-        const index = messageIds.indexOf(draft.id);
-        if (index !== -1) {
-          messageIds[index] = message.id;
-        }
-        state.messagesInRooms[roomId] = messagesInRoom;
+      .addCase(sendMessage.fulfilled, (state, action) => {
+        // const { roomId, draft, message } = action.payload;
+        // if (!message) {
+        //   return;
+        // }
       });
   },
 });
 
-export const { loadNewMessages } = messagesSlice.actions;
+export const { loadNewMessages, replaceMessage } = messagesSlice.actions;
 
 export const fetchMessages = createAsyncThunk(
   "messages/fetchMessages",
@@ -124,21 +134,22 @@ export const fetchMessages = createAsyncThunk(
   }
 );
 
-export const createNewMessage = createAsyncThunk<
+export const sendMessage = createAsyncThunk<
   { roomId: string; draft: MessageDraft; message?: Message },
   {
+    id?: string;
     roomId: string;
     user: User;
     content: string;
     format: ContentFormat;
   }
->("messages/newMessage", async (payload, thunkAPI) => {
+>("messages/sendMessage", async (payload, thunkAPI) => {
   const { dispatch } = thunkAPI;
-  const { roomId, user, content, format } = payload;
+  const { id, roomId, user, content, format } = payload;
   const timestamp = getTimestampInSeconds();
 
-  const draft: MessageDraft = {
-    id: generateUUID(),
+  let draft: MessageDraft = {
+    id: id ?? generateUUID(),
     roomId: roomId,
     userId: user.id,
     displayName: user.displayName,
@@ -150,8 +161,16 @@ export const createNewMessage = createAsyncThunk<
     status: "sending",
   };
 
-  // add draft to the message list
-  dispatch(loadNewMessages({ roomId, messages: [draft], users: [user] }));
+  // send the message first time
+  if (!id) {
+    // add draft to the message list
+    dispatch(
+      newMessage({ roomId, message: draft, user: user, draftId: draft.id })
+    );
+  } else {
+    // resend
+    dispatch(updateMessage({ message: draft }));
+  }
 
   try {
     const res = await fetch(`/api/rooms/${roomId}/messages`, {
@@ -162,23 +181,58 @@ export const createNewMessage = createAsyncThunk<
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
+        id: draft.id,
         content,
         format,
       }),
     });
-    draft.status = "sent";
-    const message = await res.json();
+    draft = {
+      ...draft,
+      status: "sent",
+    };
+    const { message, user } = await res.json();
+    dispatch(
+      replaceMessage({
+        roomId,
+        oldMessageId: draft.id,
+        newMessageId: message.id,
+      })
+    );
 
     return {
       roomId,
       draft,
       message,
+      user,
     };
   } catch (ex) {
     // set message's status
-    draft.status = "failed";
+    draft = {
+      ...draft,
+      status: "failed",
+    };
+    dispatch(updateMessage({ message: draft }));
     return { roomId, draft, message: undefined };
   }
+});
+
+// recieved a new message
+export const newMessage = createAsyncThunk<
+  undefined,
+  {
+    roomId: string;
+    draftId: string;
+    user: User;
+    message: Message;
+  }
+>("messages/newMessage", async (data, thunkAPI) => {
+  const { roomId, message, draftId, user } = data;
+  const { dispatch } = thunkAPI;
+  dispatch(
+    replaceMessage({ roomId, oldMessageId: draftId, newMessageId: message.id })
+  );
+  dispatch(loadNewMessages({ roomId, messages: [message], users: [user] }));
+  return undefined;
 });
 
 export default messagesSlice.reducer;

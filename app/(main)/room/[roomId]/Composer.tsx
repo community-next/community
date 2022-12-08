@@ -1,12 +1,6 @@
 import React, { useCallback, useState } from "react";
 import { Flex, styled } from "@community-next/design-system";
-import {
-  createNewMessage,
-  currentUserSelector,
-  roomMessagesSelector,
-  useAppDispatch,
-  useAppSelector,
-} from "@community-next/redux";
+import { sendMessage, useAppDispatch } from "@community-next/redux";
 import type { User } from "@community-next/provider";
 
 export interface ComposerProps {
@@ -33,7 +27,7 @@ export const Composer: React.FC<ComposerProps> = ({ roomId, user }) => {
       }
       e.preventDefault();
 
-      dispatch(createNewMessage({ roomId, user, content, format: 0 }));
+      dispatch(sendMessage({ roomId, user, content, format: 0 }));
 
       setContent("");
     },

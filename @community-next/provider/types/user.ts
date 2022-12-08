@@ -5,6 +5,8 @@ export interface User {
   displayName: string;
   avatarUrl?: string;
   createdAt: number;
+  ipAddressCreated?: string;
+  ipAddressLastActivity?: string;
   lastActivityAt: number;
 }
 

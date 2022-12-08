@@ -36,7 +36,6 @@ async function handlePost(
   const message = await newMessage(
     room,
     currentUser,
-    id,
     content,
     format,
     ipAddress
@@ -49,6 +48,8 @@ async function handlePost(
   await channel.publish({
     name: "chat-message",
     data: {
+      roomId: room.id,
+      draftId: id,
       message,
       user: currentUser,
     },

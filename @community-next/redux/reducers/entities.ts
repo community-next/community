@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import type { User, Message, Room } from "@community-next/provider";
-import { createNewMessage, fetchMessages, messagesSlice } from "./messages";
+import { sendMessage, fetchMessages, messagesSlice } from "./messages";
 import { authenticationSlice } from "./authentication";
 
 const initialState = {
@@ -22,7 +22,7 @@ function updateMessages(
   });
 }
 
-function updateUser(
+function updateUserEntity(
   state: typeof initialState,
   action: PayloadAction<{ user: User }>
 ) {
@@ -32,7 +32,7 @@ function updateUser(
   }
 }
 
-function updateMessage(
+function updateMessageEntity(
   state: typeof initialState,
   action: PayloadAction<{ message: Message }>
 ) {
@@ -58,13 +58,15 @@ export const entitiesSlice = createSlice({
       const { room } = action.payload;
       state.rooms[room.id] = room;
     },
+    updateUser: updateUserEntity,
+    updateMessage: updateMessageEntity,
   },
   extraReducers: (builder) => {
     builder
       .addCase(fetchMessages.fulfilled, updateMessages)
       .addCase(messagesSlice.actions.loadNewMessages, updateMessages)
-      .addCase(authenticationSlice.actions.signedIn, updateUser)
-      .addCase(createNewMessage.fulfilled, (state, action) => {
+      .addCase(authenticationSlice.actions.signedIn, updateUserEntity)
+      .addCase(sendMessage.fulfilled, (state, action) => {
         const { message } = action.payload;
         if (message) {
           state.messages[message.id] = message;
@@ -73,6 +75,6 @@ export const entitiesSlice = createSlice({
   },
 });
 
-export const { setUser, setMessage } = entitiesSlice.actions;
+export const { setUser, setMessage, updateMessage } = entitiesSlice.actions;
 
 export default entitiesSlice.reducer;

@@ -4,7 +4,7 @@ import { Provider } from "react-redux";
 import { configureAbly, useChannel } from "@ably-labs/react-hooks";
 import { Flex, Text } from "@community-next/design-system";
 import {
-  loadNewMessages,
+  newMessage,
   signedIn,
   store,
   useAppDispatch,
@@ -27,9 +27,9 @@ export const RoomContainer: React.FC<RoomProps> = ({ roomId, user }) => {
   const dispatch = useAppDispatch();
   const [channel] = useChannel(roomId, (msg) => {
     const {
-      data: { message, user },
+      data: { message, user, draftId },
     } = msg;
-    dispatch(loadNewMessages({ roomId, messages: [message], users: [user] }));
+    dispatch(newMessage({ roomId, message, user, draftId }));
   });
 
   useEffect(() => {
