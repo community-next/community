@@ -1,3 +1,4 @@
+"use client";
 import React, { Component } from "react";
 import { Box, Flex, Stack } from "@community-next/design-system";
 import type { User, Message } from "@community-next/provider";
@@ -26,7 +27,7 @@ export interface MessageListProps {
 export class MessageList extends Component<MessageListProps> {
   containerRef: React.RefObject<HTMLDivElement>;
   scrollerRef: React.RefObject<HTMLDivElement>;
-  resizeObserver: ResizeObserver;
+  resizeObserver: ResizeObserver | undefined;
   lastClientHeight: number;
   thresholds: number;
   isSticked: boolean;
@@ -44,12 +45,12 @@ export class MessageList extends Component<MessageListProps> {
       this.handleContainerResize,
       200
     );
-    this.resizeObserver = new ResizeObserver(
-      this.handleContainerResizeDebounce
-    );
   }
 
   componentDidMount() {
+    this.resizeObserver = new ResizeObserver(
+      this.handleContainerResizeDebounce
+    );
     this.lastClientHeight = this.scrollerRef.current!.clientHeight;
     this.scrollToBottom();
     if (this.containerRef.current) {
@@ -58,7 +59,7 @@ export class MessageList extends Component<MessageListProps> {
   }
 
   componentWillUnmount() {
-    this.resizeObserver.disconnect();
+    this.resizeObserver?.disconnect();
   }
 
   componentDidUpdate(

@@ -38,6 +38,7 @@ export const Composer: React.FC<ComposerProps> = ({ roomId, user }) => {
     <Flex direction="column" border rounded borderColor className="w-full">
       <styled.textarea
         rounded
+        backgroundColor="gray-secondary"
         className="p-3 w-full h-full"
         placeholder="Type your message"
         onChange={handleValueChanged}

@@ -2,7 +2,7 @@
 import React, { useEffect } from "react";
 import { Provider } from "react-redux";
 import { configureAbly, useChannel } from "@ably-labs/react-hooks";
-import { Flex, Text } from "@community-next/design-system";
+import { Center, Flex, Text } from "@community-next/design-system";
 import {
   newMessage,
   signedIn,
@@ -13,6 +13,7 @@ import { Messages } from "./Messages";
 import { Composer } from "./Composer";
 import { User } from "@community-next/provider";
 import { fetchMessages, changeRoom } from "@community-next/redux";
+import { MenuList } from "components/nav/MenuList";
 
 export interface RoomProps {
   roomId: string;
@@ -44,11 +45,14 @@ export const RoomContainer: React.FC<RoomProps> = ({ roomId, user }) => {
   }, [dispatch, user]);
 
   return (
-    <Flex direction="column" className="h-screen">
-      <Flex borderBottom borderColor className="h-[80px] justify-between p-6">
-        <Text fontWeight="medium" textSize="2xl">
-          Public Chat Room
-        </Text>
+    <Flex direction="column" className="h-screen" backgroundColor="gray">
+      <Flex borderBottom borderColor className="h-[80px] py-6">
+        <MenuList />
+        <Center className="flex-1">
+          <Text fontWeight="medium" textSize="2xl">
+            Public Chat Room
+          </Text>
+        </Center>
       </Flex>
       <Messages roomId={roomId} />
       <Flex className="h-[160px] p-6">

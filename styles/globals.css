@@ -7,3 +7,7 @@
     @apply antialiased
   }
 }
+
+.show-sidebar .sidebar {
+  left: 0;
+}
